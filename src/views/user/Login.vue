@@ -193,7 +193,7 @@ export default {
           loginParams[!state.loginType ? 'email' : 'username'] = values.username
           loginParams.password = md5(values.password)
           Login(loginParams)
-            .then((res) => this.loginSuccess(res))
+            .then(res => this.loginSuccess(res))
             .catch(err => this.requestFailed(err))
             .finally(() => {
               state.loginBtn = false
@@ -249,7 +249,9 @@ export default {
       })
     },
     loginSuccess (res) {
+      console.log('---xxx---');
       console.log(res)
+      console.log('---xxx---');
       // check res.homePage define, set $router.push name res.homePage
       // Why not enter onComplete
       /*

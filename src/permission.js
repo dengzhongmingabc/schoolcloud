@@ -15,10 +15,12 @@ const loginRoutePath = '/user/login'
 const defaultRoutePath = '/dashboard/workplace'
 
 router.beforeEach((to, from, next) => {
+  console.log('这只是一个测试')
   NProgress.start() // start progress bar
   to.meta && (typeof to.meta.title !== 'undefined' && setDocumentTitle(`${i18nRender(to.meta.title)} - ${domTitle}`))
   /* has token */
   if (storage.get(ACCESS_TOKEN)) {
+    console.log('有token')
     if (to.path === loginRoutePath) {
       next({ path: defaultRoutePath })
       NProgress.done()
@@ -30,6 +32,10 @@ router.beforeEach((to, from, next) => {
           .dispatch('GetInfo')
           .then(res => {
             const roles = res.result && res.result.role
+
+            console.log('这只是一个测试2')
+            console.log(res.result)
+            console.log('cccccc' ,res.result.role)
             // generate dynamic router
             store.dispatch('GenerateRoutes', { roles }).then(() => {
               // 根据roles权限生成可访问的路由表
@@ -61,6 +67,7 @@ router.beforeEach((to, from, next) => {
       }
     }
   } else {
+    console.log('没有token')
     if (whiteList.includes(to.name)) {
       // 在免登录白名单，直接进入
       next()

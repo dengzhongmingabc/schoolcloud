@@ -38,6 +38,9 @@ const user = {
       return new Promise((resolve, reject) => {
         login(userInfo).then(response => {
           const result = response.result
+          console.log('-------11111---------')
+          console.log(result)
+          console.log('-------11111---------')
           storage.set(ACCESS_TOKEN, result.token, 7 * 24 * 60 * 60 * 1000)
           commit('SET_TOKEN', result.token)
           resolve()
@@ -51,9 +54,11 @@ const user = {
     GetInfo ({ commit }) {
       return new Promise((resolve, reject) => {
         getInfo().then(response => {
+
+          console.log('获得用户信息返回',response)
           const result = response.result
 
-          if (result.role && result.role.permissions.length > 0) {
+          if (result.role && result.role.permissions && result.role.permissions.length > 0) {
             const role = result.role
             role.permissions = result.role.permissions
             role.permissions.map(per => {

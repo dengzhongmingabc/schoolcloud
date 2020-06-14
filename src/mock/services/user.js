@@ -723,7 +723,7 @@ const userNav = (options) => {
       'id': 10032,
       'meta': {
         'title': '安全设置',
-        'show': false
+        'show': true
       },
       'component': 'SecuritySettings'
     },
@@ -759,6 +759,30 @@ const userNav = (options) => {
         'show': false
       },
       'component': 'NotificationSettings'
+    },
+
+    // sysusermanager
+    {
+      'name': 'sysusermanager',
+      'parentId': 0,
+      'id': 20028,
+      'meta': {
+        'title': '系统用户管理',
+        'icon': 'user',
+        'show': true
+      },
+      'redirect': '/sysusermanager/perssion',
+      'component': 'RouteView'
+    },
+    {
+      'name': 'perssion',
+      'parentId': 20028,
+      'id': 20029,
+      'meta': {
+        'title': '权限管理',
+        'show': true
+      },
+      'component': 'PersionManage'
     }
   ]
   const json = builder(nav)

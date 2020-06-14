@@ -4,8 +4,8 @@ module.exports = {
     node: true
   },
   'extends': [
-    'plugin:vue/strongly-recommended',
-    '@vue/standard'
+    'plugin:vue/strongly-recommended'
+    //'@vue/standard'
   ],
   rules: {
     'no-console': 'off',
@@ -56,7 +56,8 @@ module.exports = {
       }
     ],
     'template-curly-spacing': 'off',
-    'indent': 'off'
+    'indent': 'off',
+    "no-unused-vars": 'off'
   },
   parserOptions: {
     parser: 'babel-eslint'

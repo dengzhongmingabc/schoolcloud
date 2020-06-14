@@ -8,12 +8,14 @@ import { ACCESS_TOKEN } from '@/store/mutation-types'
 // 创建 axios 实例
 const request = axios.create({
   // API 请求的默认前缀
-  baseURL: process.env.VUE_APP_API_BASE_URL,
+  //baseURL: process.env.VUE_APP_API_BASE_URL,
+  baseURL: 'http://localhost:8888',
   timeout: 6000 // 请求超时时间
 })
 
 // 异常拦截处理器
 const errorHandler = (error) => {
+  console.log('请求错误信息request',error);
   if (error.response) {
     const data = error.response.data
     // 从 localstorage 获取 token
@@ -54,6 +56,9 @@ request.interceptors.request.use(config => {
 
 // response interceptor
 request.interceptors.response.use((response) => {
+  console.log('----------rrrr--------------')
+  console.log(response)
+  console.log('---------rrrr---------------')
   return response.data
 }, errorHandler)
 
