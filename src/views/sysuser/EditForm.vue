@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="新建URL"
+    title="修改URL"
     :width="440"
     :visible="visible"
     :confirmLoading="loading"
@@ -10,23 +10,30 @@
     <a-spin :spinning="loading">
       <a-form :form="form" v-bind="formLayout">
         <!-- 检查是否有 id 并且大于0，大于0是修改。其他是新增，新增不显示主键ID -->
-        <a-form-item v-if="model && model.key > 0" label="主键ID">
-          <a-input v-decorator="['key', { initialValue: model && model.key }]" disabled />
+        <a-form-item label="主键ID">
+          <a-input v-decorator="['id', { initialValue: model.id }]" disabled />
+        </a-form-item>
+        <a-form-item label="标题">
+          <a-input  v-decorator="['title',{ initialValue: model.title }, {rules: [{required: true, message: '名称不能为空！'}]}]" />
+        </a-form-item>
+        <a-form-item label="组件">
+          <a-input v-decorator="['component', { initialValue: model.component },{rules: [{required: true}]}]" />
         </a-form-item>
         <a-form-item label="名称">
-          <a-input  v-decorator="['permissionName',{ initialValue: model &&model.name }, {rules: [{required: true, message: '名称不能为空！'}]}]" />
+          <a-input v-decorator="['name', { initialValue: model.name },{rules: [{required: true}]}]" />
         </a-form-item>
-        <a-form-item label="URL">
-          <a-input v-decorator="['permissionUrl', { initialValue: model &&model.url },{rules: [{required: true, message: 'URL不能为空！'}]}]" />
+        <a-form-item label="跳转">
+          <a-input v-decorator="['redirect', { initialValue: model.url },{rules: [{required: true, message: 'URL不能为空！'}]}]" />
         </a-form-item>
-        <a-form-item label="ICON">
-          <a-input v-decorator="['icon', { initialValue: model &&model.icon },{rules: [{required: false}]}]" />
+        <a-form-item label="图标">
+          <a-input v-decorator="['icon', { initialValue: model.icon },{rules: [{required: false}]}]" />
         </a-form-item>
+
         <a-form-item v-show="false" label="isLeaf">
-          <a-input v-decorator="['isLeaf', { initialValue: model &&model.isLeaf },{ initialValue: false }]" disabled />
+          <a-input v-decorator="['isLeaf', { initialValue: model.isLeaf }]" disabled />
         </a-form-item>
         <a-form-item v-show="false" label="parentId">
-          <a-input v-decorator="['parentId', { initialValue: model &&model.parentId },{ initialValue: -1 }]" disabled />
+          <a-input v-decorator="['parentId', { initialValue: model.parentId }]" disabled />
         </a-form-item>
       </a-form>
     </a-spin>
@@ -41,10 +48,6 @@ const fields = ['description', 'id']
 
 export default {
   props: {
-    isAddForm: {
-      type: Boolean,
-      required: true
-    },
     visible: {
       type: Boolean,
       required: true
