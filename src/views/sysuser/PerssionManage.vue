@@ -126,7 +126,7 @@
             const result = response.result
             this.loadData = result;
             this.tableloading=false
-          },1000)
+          },500)
         }).catch(error => {
           this.tableloading=false
         })

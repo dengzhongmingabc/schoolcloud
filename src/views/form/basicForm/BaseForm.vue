@@ -112,7 +112,7 @@
 
 <script>
 export default {
-  name: 'BaseFormx',
+  name: 'BaseForm',
   data () {
     return {
       form: this.$form.createForm(this)

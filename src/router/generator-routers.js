@@ -19,7 +19,7 @@ const constantRouterComponents = {
   'Analysis': () => import('@/views/dashboard/Analysis'),
 
   // form
-  // 'BasicForm': () => import('@/views/form/BasicForm'),
+  'BasicForm': () => import('@/views/form/basicForm/BaseForm'),
   'StepForm': () => import('@/views/form/stepForm/StepForm'),
   'AdvanceForm': () => import('@/views/form/advancedForm/AdvancedForm'),
 
@@ -54,6 +54,9 @@ const constantRouterComponents = {
 
 // 系统用户管理
   'PersionManage': () => import('@/views/sysuser/PerssionManage'),
+  'UserManage': () => import('@/views/sysuser/UserManage'),
+
+
 
   'TestWork': () => import(/* webpackChunkName: "TestWork" */ '@/views/dashboard/TestWork')
 }
