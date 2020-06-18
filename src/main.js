@@ -21,10 +21,14 @@ import './permission' // permission control
 import './utils/filter' // global filter
 import './global.less'
 
+
+import {Tree} from 'ant-design-vue'
+
 Vue.config.productionTip = false
 
 // mount axios to `Vue.$http` and `this.$http`
 Vue.use(VueAxios)
+Vue.use(Tree)
 Vue.component('pro-layout', ProLayout)
 Vue.component('page-header-wrapper', PageHeaderWrapper)
 

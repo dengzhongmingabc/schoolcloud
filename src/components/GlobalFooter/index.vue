@@ -6,7 +6,7 @@
       <a href="https://www.github.com/sendya/" target="_blank">@Sendya</a>-->
     </template>
     <template v-slot:copyright>
-      <a href="https://www.honorfly.com" target="_blank">誉飞科技有限公司提供支持</a>
+      <a href="https://www.honorfly.com" target="_blank">智能教培信息有限公司提供技术支持</a>
     </template>
   </global-footer>
 </template>

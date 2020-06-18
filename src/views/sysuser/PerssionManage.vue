@@ -13,15 +13,27 @@
         rowKey="id"
         showPagination="auto"
       >
-        <span slot="action" slot-scope="text, record">
-          <template>
-            <a @click="handleEdit(record)">编辑</a>
-            <a-divider type="vertical" />
-            <a @click="handleDel(record)">删除</a>
-            <a-divider type="vertical" />
-            <a @click="addchildren(record)">增加子节点</a>
-          </template>
-        </span>
+
+
+         <span slot="action" slot-scope="text, record">
+                   <a @click="handleEdit(record)">编辑</a>
+        <a-divider type="vertical" />
+        <a-dropdown>
+          <a class="ant-dropdown-link">更多 <a-icon type="down" />
+          </a>
+          <a-menu slot="overlay">
+            <a-menu-item>
+              <a @click="handleDel(record)">删除</a>
+            </a-menu-item>
+            <a-menu-item>
+              <a @click="addchildren(record)">增加子节点</a>
+            </a-menu-item>
+            <a-menu-item>
+              <a @click="">增加按钮</a>
+            </a-menu-item>
+          </a-menu>
+        </a-dropdown>
+      </span>
       </a-table>
 
       <Add-form
@@ -40,6 +52,8 @@
         @cancel="ehandleCancel"
         @ok="ehandleOk"
       />
+
+
     </a-card>
   </page-header-wrapper>
 </template>
@@ -49,25 +63,26 @@
   import { getPessionList,savePession,deletePession,editPession } from '@/api/sysManage'
   import AddForm from  './AddForm'
   import EditForm from "./EditForm";
+  import ButtonForm from './ButtionForm'
 
   const columns = [
     {
       title: '标题',
       dataIndex: 'title',
       key: 'title',
-      width: '15%',
+      width: '10%',
     },
     {
       title: '名称',
       dataIndex: 'name',
       key: 'name',
-      width: '15%',
+      width: '10%',
     },
     {
       title: '组件',
       dataIndex: 'component',
       key: 'component',
-      width: '15%',
+      width: '10%',
     },
     {
       title: '图标',
@@ -78,13 +93,19 @@
     {
       title: '跳转',
       dataIndex: 'url',
-      width: '25%',
+      width: '20%',
+      key: 'url',
+    },
+    {
+      title: '跳转',
+      dataIndex: 'url',
+      width: '20%',
       key: 'url',
     },
     {
       title: '操作',
       dataIndex: 'action',
-      width: '45%',
+      width: '10%',
       scopedSlots: { customRender: 'action' }
     }
   ];
@@ -99,6 +120,7 @@
     },
     data () {
       return {
+        buttonShow:false,
         columns,
         avisible: false,
         aconfirmLoading: false,
@@ -131,6 +153,7 @@
           this.tableloading=false
         })
       },
+
       handleAdd () {
         this.amdl = null
         this.avisible = true
