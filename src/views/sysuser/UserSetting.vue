@@ -104,8 +104,8 @@
 
   const columns = [
     {
-      title: '规则编号',
-      dataIndex: 'id'
+      title: '#',
+      scopedSlots: { customRender: 'serial' }
     },
     {
       title: '真实姓名',
