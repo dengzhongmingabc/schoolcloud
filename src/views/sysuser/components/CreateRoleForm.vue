@@ -16,6 +16,16 @@
         <a-form-item label="角色名称">
           <a-input v-decorator="['roleName', { initialValue: model && model.roleName },{rules: [{required: true, min: 2, message: '请输入至少两个字符的规则描述！'}]}]" />
         </a-form-item>
+        <a-form-item label="状态">
+            <a-radio-group button-style="solid" v-decorator="['invalid', { initialValue: model && model.invalid+'' }]">
+              <a-radio-button value='true'>
+                有效
+              </a-radio-button>
+              <a-radio-button value='false'>
+                无效
+              </a-radio-button>
+            </a-radio-group>
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>

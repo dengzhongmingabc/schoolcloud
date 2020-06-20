@@ -4,46 +4,28 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="规则编号">
-                <a-input v-model="queryParam.id" placeholder=""/>
+              <a-form-item label="真实名称">
+                <a-input v-model="queryParam.realName" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="使用状态">
-                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
-                  <a-select-option value="0">全部</a-select-option>
-                  <a-select-option value="1">关闭</a-select-option>
-                  <a-select-option value="2">运行中</a-select-option>
+                <a-select v-model="queryParam.invalid" placeholder="请选择" default-value="">
+                  <a-select-option value="">全部</a-select-option>
+                  <a-select-option value="false">锁定</a-select-option>
+                  <a-select-option value="true">解锁</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <template v-if="advanced">
               <a-col :md="8" :sm="24">
-                <a-form-item label="调用次数">
-                  <a-input-number v-model="queryParam.callNo" style="width: 100%"/>
+                <a-form-item label="手机号码">
+                  <a-input v-model="queryParam.mobile" placeholder=""/>
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
-                <a-form-item label="更新日期">
-                  <a-date-picker v-model="queryParam.date" style="width: 100%" placeholder="请输入更新日期"/>
-                </a-form-item>
-              </a-col>
-              <a-col :md="8" :sm="24">
-                <a-form-item label="使用状态">
-                  <a-select v-model="queryParam.useStatus" placeholder="请选择" default-value="0">
-                    <a-select-option value="0">全部</a-select-option>
-                    <a-select-option value="1">关闭</a-select-option>
-                    <a-select-option value="2">运行中</a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-              <a-col :md="8" :sm="24">
-                <a-form-item label="使用状态">
-                  <a-select placeholder="请选择" default-value="0">
-                    <a-select-option value="0">全部</a-select-option>
-                    <a-select-option value="1">关闭</a-select-option>
-                    <a-select-option value="2">运行中</a-select-option>
-                  </a-select>
+                <a-form-item label="用户名">
+                  <a-input v-model="queryParam.userName" placeholder="请输入用户名"/>
                 </a-form-item>
               </a-col>
             </template>
@@ -83,64 +65,72 @@
         :data="loadData"
         :alert="true"
         :rowSelection="rowSelection"
-        showPagination="auto"
+        showPagination="true"
       >
         <span slot="serial" slot-scope="text, record, index">
           {{ index + 1 }}
         </span>
-        <span slot="status" slot-scope="text">
-          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+        <span slot="invalid" slot-scope="invalid">
+          {{invalid?'解锁':'锁定'}}
         </span>
-        <span slot="description" slot-scope="text">
-          <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
-        </span>
-
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)">配置</a>
+            <a @click="handleEdit(record)">编辑</a>
             <a-divider type="vertical" />
-            <a @click="handleSub(record)">订阅报警</a>
+            <a @click="deleteSysUser(record)">删除</a>
           </template>
         </span>
       </s-table>
+
+
+      <create-user-form
+        ref="createUserModal"
+        :visible="visible"
+        :loading="confirmLoading"
+        :model="mdl"
+        :roles="roleListData"
+        @cancel="handleCancel"
+        @ok="handleOk"
+      />
     </a-card>
 </template>
 
 <script>
   import moment from 'moment'
   import { STable, Ellipsis } from '@/components'
-  import { getRoleList, getServiceList } from '@/api/manage'
+  import { userPageList,saveSysUser,deleteSysUser,roleList,detailSysUser,editSysUser} from '@/api/sysManage'
 
+  import CreateUserForm from "./components/CreateUserForm";
 
   const columns = [
     {
-      title: '#',
-      scopedSlots: { customRender: 'serial' }
-    },
-    {
       title: '规则编号',
-      dataIndex: 'no'
+      dataIndex: 'id'
     },
     {
-      title: '描述',
-      dataIndex: 'description',
-      scopedSlots: { customRender: 'description' }
+      title: '真实姓名',
+      dataIndex: 'realName',
     },
     {
-      title: '服务调用次数',
-      dataIndex: 'callNo',
-      sorter: true,
-      needTotal: true,
-      customRender: (text) => text + ' 次'
+      title: '用户名',
+      dataIndex: 'userName',
+    },
+    {
+      title: '职位',
+      dataIndex: 'position',
+    },
+    {
+      title: '手机',
+      dataIndex: 'mobile',
     },
     {
       title: '状态',
-      dataIndex: 'status',
-      scopedSlots: { customRender: 'status' }
+      dataIndex: 'invalid',
+      scopedSlots: { customRender: 'invalid' }
     },
     {
       title: '更新时间',
-      dataIndex: 'updatedAt',
+      dataIndex: 'createTime',
       sorter: true
     },
     {
@@ -174,7 +164,8 @@
     name: 'TableList',
     components: {
       STable,
-      Ellipsis
+      Ellipsis,
+      CreateUserForm
     },
     data () {
       this.columns = columns
@@ -183,6 +174,7 @@
         visible: false,
         confirmLoading: false,
         mdl: null,
+        roleListData:null,
         // 高级搜索 展开/关闭
         advanced: false,
         // 查询参数
@@ -191,7 +183,7 @@
         loadData: parameter => {
           const requestParameters = Object.assign({}, parameter, this.queryParam)
           console.log('loadData request parameters:', requestParameters)
-          return getServiceList(requestParameters)
+          return userPageList(requestParameters)
             .then(res => {
               return res.result
             })
@@ -209,7 +201,7 @@
       }
     },
     created () {
-      getRoleList({ t: new Date() })
+
     },
     computed: {
       rowSelection () {
@@ -221,26 +213,33 @@
     },
     methods: {
       handleAdd () {
-        this.mdl = null
-        this.visible = true
+        roleList().then((response)=>{
+          this.mdl = {}
+          this.mdl.roles = response.result
+          this.visible = true
+        })
       },
       handleEdit (record) {
-        this.visible = true
-        this.mdl = { ...record }
+        Promise.all([detailSysUser(record),roleList()]).then((result) => {
+          console.log(result);
+          this.mdl = {...record}
+          this.mdl.roles = result[1].result
+          this.mdl.newRoles = result[0].result.roles
+          this.visible = true
+        }).catch((error) => {
+          console.log(error)
+        })
       },
       handleOk () {
-        const form = this.$refs.createModal.form
+        const form = this.$refs.createUserModal.form
         this.confirmLoading = true
         form.validateFields((errors, values) => {
           if (!errors) {
+            values.newRoles = values.newRoles.join(',')
             console.log('values', values)
             if (values.id > 0) {
               // 修改 e.g.
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  resolve()
-                }, 1000)
-              }).then(res => {
+              editSysUser(values).then((response)=>{
                 this.visible = false
                 this.confirmLoading = false
                 // 重置表单数据
@@ -252,11 +251,7 @@
               })
             } else {
               // 新增
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  resolve()
-                }, 1000)
-              }).then(res => {
+              saveSysUser(values).then((response)=>{
                 this.visible = false
                 this.confirmLoading = false
                 // 重置表单数据
@@ -275,7 +270,7 @@
       handleCancel () {
         this.visible = false
 
-        const form = this.$refs.createModal.form
+        const form = this.$refs.createUserModal.form
         form.resetFields() // 清理表单数据（可不做）
       },
       handleSub (record) {
@@ -284,6 +279,24 @@
         } else {
           this.$message.error(`${record.no} 订阅失败，规则已关闭`)
         }
+      },
+      deleteSysUser(record){
+        let self = this;
+        let contents = `${record.realName} 即将被删除！`
+        this.$confirm({
+          title: '删除后不能恢复，您确定要删除吗?',
+          content: contents,
+          onOk() {
+            deleteSysUser(record).then((response)=>{
+              self.$message.info(`${record.realName} 删除成功`)
+              self.$refs.table.refresh()
+            })
+          },
+          onCancel() {}
+        });
+
+
+
       },
       onSelectChange (selectedRowKeys, selectedRows) {
         this.selectedRowKeys = selectedRowKeys

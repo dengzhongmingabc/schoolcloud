@@ -1,0 +1,117 @@
+<template>
+  <a-modal
+    title="用户表单"
+    :width="640"
+    :visible="visible"
+    :confirmLoading="loading"
+    @ok="() => { $emit('ok') }"
+    @cancel="() => { $emit('cancel') }"
+  >
+    <a-spin :spinning="loading">
+      <a-form :form="form" v-bind="formLayout">
+        <!-- 检查是否有 id 并且大于0，大于0是修改。其他是新增，新增不显示主键ID -->
+        <a-form-item v-show="model && model.id > 0" label="主键ID">
+          <a-input v-decorator="['id', { initialValue: 0 }]" disabled />
+        </a-form-item>
+        <a-form-item label="用户名">
+          <a-input v-decorator="['userName',{rules: [{required: true, min: 2, message: '请输入至少两个字符的用户名！'}]}]" placeholder="请输入用户名">
+            <a-icon slot="prefix" type="user" />
+            <a-tooltip slot="suffix" title="用户登录账号，系统唯一！">
+              <a-icon type="info-circle" style="color: rgba(0,0,0,.45)" />
+            </a-tooltip>
+          </a-input>
+        </a-form-item>
+        <a-form-item label="密码">
+          <a-input-password v-decorator="['password', {rules: [{required: false, min: 6, message: '请输入至少6个字符'}]}]" :placeholder="test"/>
+        </a-form-item>
+        <a-form-item label="用户姓名">
+          <a-input v-decorator="['realName', {rules: [{required: true, min: 2, message: '请输入至少两个字符的姓名！'}]}]" />
+        </a-form-item>
+        <a-form-item label="职位">
+          <a-input v-decorator="['position',{rules: [{required: true, min: 2, message: '请输入至少两个字符的规则描述！'}]}]" />
+        </a-form-item>
+        <a-form-item label="手机号码">
+          <a-input v-decorator="['mobile', { initialValue: model && model.mobile },{rules: [{required: true, min: 2, message: '请输入至少两个字符的规则描述！'}]}]" >
+            <a-icon slot="prefix" type="phone" />
+          </a-input>
+        </a-form-item>
+        <a-form-item label="角色">
+          <a-select
+            v-decorator="['newRoles', { rules: [{required: true}] }]"
+            mode="multiple"
+            style="width: 100%"
+            placeholder="选择角色"
+            option-label-prop="label"
+          >
+            <a-select-option v-for="item in model.roles" :value="item.id" :label="item.realName">
+              {{item.realName}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="状态">
+            <a-radio-group button-style="solid" v-decorator="['invalid', { initialValue: 'true' }]">
+              <a-radio-button value='true'>
+                解锁
+              </a-radio-button>
+              <a-radio-button value='false'>
+                锁定
+              </a-radio-button>
+            </a-radio-group>
+        </a-form-item>
+      </a-form>
+    </a-spin>
+  </a-modal>
+</template>
+
+<script>
+import pick from 'lodash.pick'
+
+// 表单字段
+const fields = ['userName', 'realName','id','password','position','mobile','newRoles']
+
+export default {
+  props: {
+    visible: {
+      type: Boolean,
+      required: true
+    },
+    loading: {
+      type: Boolean,
+      default: () => false
+    },
+    model: {
+      type: Object,
+      default: () => null
+    },
+  },
+  data () {
+    this.formLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 7 }
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 13 }
+      }
+    }
+    return {
+      test:this.model&&this.model.id>0?"可以不输入，输入密码即修改以前的密码":"请输入密码1",
+      form: this.$form.createForm(this),
+      value:[],
+
+    }
+  },
+  created () {
+    console.log('custom modal createdxxxxxxxxx-----------------------------')
+
+    // 防止表单未注册
+    fields.forEach(v => this.form.getFieldDecorator(v))
+
+    // 当 model 发生改变时，为表单设置值
+    this.$watch('model', () => {
+      this.model && this.form.setFieldsValue(pick(this.model, fields))
+    })
+  }
+}
+</script>
