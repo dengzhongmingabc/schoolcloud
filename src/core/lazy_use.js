@@ -113,4 +113,5 @@ Vue.use(PageLoading)
 Vue.use(PermissionHelper)
 Vue.use(VueCropper)
 
+console.log("NOTICE: Antd use lazy-load",process.env.NODE_ENV);
 process.env.NODE_ENV !== 'production' && console.warn('[antd-pro] NOTICE: Antd use lazy-load.')
