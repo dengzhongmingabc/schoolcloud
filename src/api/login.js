@@ -4,7 +4,8 @@ const userApi = {
   Login: '/login',
   //Login: '/sys/user/userLogin',
   //Login: '/auth/login',
-  Logout: '/auth/logout',
+  Logout: '/sys/user/logout',
+  //Logout: '/auth/logout',
   ForgePassword: '/auth/forge-password',
   Register: '/auth/register',
   twoStepCode: '/auth/2step-code',
@@ -32,7 +33,20 @@ export function login (parameter) {
   return request({
     url: userApi.Login,
     method: 'post',
-    data: parameter
+    data: parameter,
+    transformRequest: [
+      function (data) {
+        let ret = ''
+        for (let it in data) {
+          ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+        }
+        ret = ret.substring(0, ret.lastIndexOf('&'));
+        return ret
+      }
+    ],
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
   })
 }
 

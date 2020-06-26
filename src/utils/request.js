@@ -50,18 +50,17 @@ request.interceptors.request.use(config => {
   // 让每个请求携带自定义 token 请根据实际情况自行修改
   if (token) {
     config.headers['Access-Token'] = token
-    config.headers["Content-type"] = "application/json"
   }
   return config
 }, errorHandler)
 
 // response interceptor
 request.interceptors.response.use((response) => {
-  console.log('----------rrrr--------------')
-  console.log(response)
-  console.log('---------rrrr---------------')
+  console.log("请求返回的数据:",response)
   return response.data
-}, errorHandler)
+}, (error => {
+  console.log("请求返回的错误信息：",error);
+}))
 
 const installer = {
   vm: {},

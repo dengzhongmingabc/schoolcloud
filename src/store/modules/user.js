@@ -38,12 +38,10 @@ const user = {
       return new Promise((resolve, reject) => {
         login(userInfo).then(response => {
           const token = response.result //
-          console.log('-------11111---------')
-          console.log(token)
-          console.log('-------11111---------')
+          console.log("登录返回的token",token)
           storage.set(ACCESS_TOKEN, token, 7 * 24 * 60 * 60 * 1000)
           commit('SET_TOKEN', token)
-          resolve()
+          resolve(response)
         }).catch(error => {
           reject(error)
         })

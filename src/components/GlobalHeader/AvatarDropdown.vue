@@ -29,6 +29,7 @@
 
 <script>
 import { Modal } from 'ant-design-vue'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'AvatarDropdown',
@@ -43,6 +44,8 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['Login', 'Logout']),
+
     handleToCenter () {
       this.$router.push({ path: '/account/center' })
     },
@@ -51,11 +54,26 @@ export default {
     },
     handleLogout (e) {
       Modal.confirm({
-        title: this.$t('layouts.usermenu.dialog.title'),
-        content: this.$t('layouts.usermenu.dialog.content'),
+        title: this.$t('提示'),
+        content: this.$t('您确定要退出吗？'),
         onOk: () => {
           return new Promise((resolve, reject) => {
-            setTimeout(Math.random() > 0.5 ? resolve : reject, 1500)
+            /*setTimeout(Math.random() > 0.5 ? resolve : reject, 1500)
+            let data = {};
+            axios.post(`${this.$url}/test/testRequest`,data).then(res=>{
+                console.log('res=>',res);
+            })*/
+
+            /*logout().then(response=>{
+              this.$router.red.push({ redirect: '/user/login' })
+            })*/
+
+            this.Logout().then(() => {
+              setTimeout(() => {
+                window.location.reload()
+              }, 100)
+              resolve()
+            })
           }).catch(() => console.log('Oops errors!'))
         },
         onCancel () {}
