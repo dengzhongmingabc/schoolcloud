@@ -57,15 +57,16 @@
         </a-dropdown>
       </div>
 
+
       <s-table
         ref="table"
         size="default"
-        rowKey="key"
+        rowKey="id"
         :columns="columns"
         :data="loadData"
         :alert="true"
         :rowSelection="rowSelection"
-        showPagination="true"
+        showPagination="auto"
       >
         <span slot="serial" slot-scope="text, record, index">
           {{ index + 1 }}
@@ -96,12 +97,14 @@
 </template>
 
 <script>
+  import { getRoleList, getServiceList } from '@/api/manage'
   import moment from 'moment'
   import { STable, Ellipsis } from '@/components'
   import { userPageList,saveSysUser,deleteSysUser,roleList,detailSysUser,editSysUser} from '@/api/sysManage'
 
   import CreateUserForm from "./components/CreateUserForm";
 
+  import {responseHandler} from '@/utils/responseHandler'
   const columns = [
     {
       title: '#',
@@ -173,7 +176,7 @@
         // create model
         visible: false,
         confirmLoading: false,
-        mdl: null,
+        mdl: {roles:[]},
         roleListData:null,
         // 高级搜索 展开/关闭
         advanced: false,
@@ -181,11 +184,25 @@
         queryParam: {},
         // 加载数据方法 必须为 Promise 对象
         loadData: parameter => {
+
+        /*  const requestParameters = Object.assign({}, parameter, this.queryParam)
+          console.log('loadData request parameters:', requestParameters)
+          return this.$http.post('/sys/user/userPageList', {
+            params: requestParameters
+          }).then(res => {
+            console.log(res.result)
+            return res.result
+          })*/
+
           const requestParameters = Object.assign({}, parameter, this.queryParam)
           console.log('loadData request parameters:', requestParameters)
-          return userPageList(requestParameters)
-            .then(res => {
-              return res.result
+          return userPageList(requestParameters).then(res => {
+
+              if(responseHandler(res,true)){
+                return res.result
+
+              }
+
             })
         },
         selectedRowKeys: [],

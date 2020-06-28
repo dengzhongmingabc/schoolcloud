@@ -97,12 +97,6 @@
       key: 'url',
     },
     {
-      title: '跳转',
-      dataIndex: 'url',
-      width: '20%',
-      key: 'url',
-    },
-    {
       title: '操作',
       dataIndex: 'action',
       width: '10%',
@@ -127,8 +121,8 @@
         evisible: false,
         econfirmLoading: false,
         tableloading:false,
-        amdl: null,
-        emdl: null,
+        amdl: {},
+        emdl: {},
         // 高级搜索 展开/关闭
         advanced: false,
         // 查询参数

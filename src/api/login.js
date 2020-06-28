@@ -9,7 +9,7 @@ const userApi = {
   ForgePassword: '/auth/forge-password',
   Register: '/auth/register',
   twoStepCode: '/auth/2step-code',
-  SendSms: '/account/sms',
+  SendSms: '/sys/user/getCaptcha',
   SendSmsErr: '/account/sms_err',
   // get my info
  /* UserInfo: '/user/info',
@@ -54,7 +54,20 @@ export function getSmsCaptcha (parameter) {
   return request({
     url: userApi.SendSms,
     method: 'post',
-    data: parameter
+    data: parameter,
+    transformRequest: [
+      function (data) {
+        let ret = ''
+        for (let it in data) {
+          ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+        }
+        ret = ret.substring(0, ret.lastIndexOf('&'));
+        return ret
+      }
+    ],
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
   })
 }
 

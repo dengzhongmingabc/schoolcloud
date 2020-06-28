@@ -40,7 +40,7 @@
       :data="loadData"
       :alert="true"
       :rowSelection="rowSelection"
-      showPagination="true"
+      showPagination="auto"
     >
       <span slot="invalid" slot-scope="invalid">
           {{invalid?'有效':'无效'}}

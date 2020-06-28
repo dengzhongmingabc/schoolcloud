@@ -13,12 +13,12 @@
         @change="handleTabClick"
       >
         <a-tab-pane key="tab1" tab="账号密码登录">
-          <a-alert v-if="isLoginError" type="error" showIcon style="margin-bottom: 24px;" message="账户或密码错误（admin/ant.design )" />
+          <a-alert v-if="isLoginError" type="error" showIcon style="margin-bottom: 24px;" message="账户或密码错误!" />
           <a-form-item>
             <a-input
               size="large"
               type="text"
-              placeholder="账户: admin"
+              placeholder="帐户名"
               v-decorator="[
                 'username',
                 {rules: [{ required: true, message: '请输入帐户名或邮箱地址' }, { validator: handleUsernameOrEmail }], validateTrigger: 'change'}
@@ -33,7 +33,7 @@
               size="large"
               type="password"
               autocomplete="false"
-              placeholder="密码: admin or ant.design"
+              placeholder="密码"
               v-decorator="[
                 'password',
                 {rules: [{ required: true, message: '请输入密码' }], validateTrigger: 'blur'}
@@ -71,7 +71,7 @@
         </a-tab-pane>
       </a-tabs>
 
-      <a-form-item>
+      <!--<a-form-item>
         <a-checkbox v-decorator="['rememberMe', { valuePropName: 'checked' }]">自动登录</a-checkbox>
         <router-link
           :to="{ name: 'recover', params: { user: 'aaa'} }"
@@ -79,7 +79,7 @@
           style="float: right;"
         >忘记密码</router-link>
       </a-form-item>
-
+-->
       <a-form-item style="margin-top:24px">
         <a-button
           size="large"
@@ -91,7 +91,7 @@
         >确定</a-button>
       </a-form-item>
 
-      <div class="user-login-other">
+   <!--   <div class="user-login-other">
         <span>其他登录方式</span>
         <a>
           <a-icon class="item-icon" type="alipay-circle"></a-icon>
@@ -103,7 +103,7 @@
           <a-icon class="item-icon" type="weibo-circle"></a-icon>
         </a>
         <router-link class="register" :to="{ name: 'register' }">注册账户</router-link>
-      </div>
+      </div>-->
     </a-form>
 
     <two-step-captcha
@@ -193,6 +193,10 @@ export default {
           loginParams[!state.loginType ? 'email' : 'username'] = values.username
           //loginParams.password = md5(values.password)
           loginParams.password = values.password
+          if(state.loginType==0){
+            loginParams.username = "mobile:"+values.mobile
+            loginParams.password = values.captcha
+          }
           Login(loginParams)
             .then(res => this.loginSuccess(res))
             .catch(err => this.requestFailed(err))
@@ -227,7 +231,7 @@ export default {
             setTimeout(hide, 2500)
             this.$notification['success']({
               message: '提示',
-              description: '验证码获取成功，您的验证码为：' + res.result.captcha,
+              description: '验证码获取成功，您的验证码为：' + res.result,
               duration: 8
             })
           }).catch(err => {
