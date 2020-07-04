@@ -139,9 +139,9 @@ const constantRouterComponents = {
 
 
 
-// 前端未找到页面路由（固定不用改）
+// 前端未找到页面路由（固定不用改）/dashboard/workplace每一个用户都要这个权限
 const notFoundRouter = {
-  path: '*', redirect: '/404', hidden: true
+  path: '*', redirect: '/dashboard/workplace', hidden: true
 }
 
 // 根级菜单

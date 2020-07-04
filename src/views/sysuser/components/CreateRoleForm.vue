@@ -1,11 +1,12 @@
 <template>
   <a-modal
-    title="新建规则"
-    :width="640"
+    :maskClosable="false"
+    title="角色编辑"
+    :width="840"
     :visible="visible"
     :confirmLoading="loading"
     @ok="() => { $emit('ok') }"
-    @cancel="() => { $emit('cancel') }"
+    @cancel="() => { this.selectSchool=false;$emit('cancel') }"
   >
     <a-spin :spinning="loading">
       <a-form :form="form" v-bind="formLayout">
@@ -17,7 +18,7 @@
           <a-input v-decorator="['roleName', { initialValue: model && model.roleName },{rules: [{required: true, min: 2, message: '请输入至少两个字符的规则描述！'}]}]" />
         </a-form-item>
         <a-form-item label="状态">
-            <a-radio-group button-style="solid" v-decorator="['invalid', { initialValue: model && model.invalid+'' }]">
+            <a-radio-group button-style="solid" v-decorator="['invalid', { initialValue: model.invalid?(model.invalid+''):'true' }]">
               <a-radio-button value='true'>
                 有效
               </a-radio-button>
@@ -25,6 +26,34 @@
                 无效
               </a-radio-button>
             </a-radio-group>
+        </a-form-item>
+        <a-form-item label="所属校区">
+          <a-row>
+            <a-col :span="12">
+              <a-radio-group button-style="solid" v-decorator="['selectType', { initialValue: '1' }]">
+                <a-radio-button value='1'>
+                  所有校区
+                </a-radio-button>
+                <a-radio-button value='2'>
+                  部分校区
+                </a-radio-button>
+              </a-radio-group>
+            </a-col>
+            <a-col :span="12">
+              <a-select
+                v-show="form.getFieldValue('selectType') === '2'"
+                v-decorator="['selectedSchool', { rules: [{required: false}] }]"
+                mode="multiple"
+                style="width: 100%"
+                placeholder="指定校区"
+                option-label-prop="label"
+              >
+                <a-select-option v-for="(item,index) in model.schools" :value="item.id" :label="item.name" :key="index">
+                  {{item.name}}
+                </a-select-option>
+              </a-select>
+            </a-col>
+          </a-row>
         </a-form-item>
       </a-form>
     </a-spin>
@@ -35,7 +64,7 @@
 import pick from 'lodash.pick'
 
 // 表单字段
-const fields = ['description', 'id']
+const fields = ['description', 'id','selectedSchool','selectType']
 
 export default {
   props: {
@@ -49,7 +78,7 @@ export default {
     },
     model: {
       type: Object,
-      default: () => null
+      default: () => {}
     }
   },
   data () {
@@ -64,7 +93,7 @@ export default {
       }
     }
     return {
-      form: this.$form.createForm(this)
+      form: this.$form.createForm(this),
     }
   },
   created () {
@@ -77,6 +106,9 @@ export default {
     this.$watch('model', () => {
       this.model && this.form.setFieldsValue(pick(this.model, fields))
     })
+  },
+  methods:{
+
   }
 }
 </script>

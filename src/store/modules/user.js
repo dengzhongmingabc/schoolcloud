@@ -40,6 +40,7 @@ const user = {
           const token = response.result //
           console.log("登录返回的token",token)
           storage.set(ACCESS_TOKEN, token, 7 * 24 * 60 * 60 * 1000)
+          //storage.set(ACCESS_TOKEN, token, 5 * 60 * 1000)
           commit('SET_TOKEN', token)
           resolve(response)
         }).catch(error => {

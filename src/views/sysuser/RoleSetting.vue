@@ -80,12 +80,14 @@
 <script>
   import moment from 'moment'
   import { STable, Ellipsis } from '@/components'
-  import { settingRolePermission,roleListPermission,getRolePageList } from '@/api/sysManage'
+  import { settingRolePermission,roleListPermission,getRolePageList,queryRoleDetail} from '@/api/sysManage'
 
   import CreateRoleForm from "./components/CreateRoleForm";
   import {saveRole} from "../../api/sysManage";
 
   import CreateRoleTreeForm from "./components/CreateRoleTreeForm";
+
+  import {schoolQuery} from '@/api/school'
 
   const columns = [
     {
@@ -146,7 +148,7 @@
         // create model
         visible: false,
         confirmLoading: false,
-        mdl: null,
+        mdl: {},
 
         visibleTree: false,
         confirmLoadingTree: false,
@@ -190,12 +192,25 @@
 
 
       handleAdd () {
-        this.mdl = null
-        this.visible = true
+        schoolQuery().then((response)=>{
+          if(response.success){
+            this.mdl = {}
+            this.mdl.schools = response.result
+            this.visible = true
+          }
+        })
       },
       handleEdit (record) {
-        this.visible = true
-        this.mdl = { ...record }
+        Promise.all([queryRoleDetail(record),schoolQuery()]).then((result) => {
+          console.log(result);
+          this.mdl = {...record}
+          this.mdl.selectedSchool = result[0].result.schools
+          this.mdl.schools = result[1].result
+          this.mdl.selectType = result[0].result.selectType+''
+          this.visible = true
+        }).catch((error) => {
+          console.log(error)
+        })
       },
 
       handleTreeOk (args) {
@@ -209,6 +224,7 @@
         this.confirmLoading = true
         form.validateFields((errors, values) => {
           if (!errors) {
+            values.schoolIdStr = values.selectedSchool&&values.selectedSchool.join(',')
             console.log('values', values)
             if (values.id > 0) {
               saveRole(values).then(response =>{
@@ -240,7 +256,6 @@
       },
       handleCancel () {
         this.visible = false
-
         const form = this.$refs.createModal.form
         form.resetFields() // 清理表单数据（可不做）
       },

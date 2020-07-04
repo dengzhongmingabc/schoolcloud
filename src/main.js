@@ -26,6 +26,10 @@ import {Tree} from 'ant-design-vue'
 
 Vue.config.productionTip = false
 
+
+
+
+
 // mount axios to `Vue.$http` and `this.$http`
 Vue.use(VueAxios)
 Vue.use(Tree)

@@ -43,7 +43,7 @@
             placeholder="选择角色"
             option-label-prop="label"
           >
-            <a-select-option v-for="item in model.roles" :value="item.id" :label="item.realName">
+            <a-select-option v-for="(item,index) in model.roles" :value="item.id" :label="item.realName" :key="index">
               {{item.realName}}
             </a-select-option>
           </a-select>

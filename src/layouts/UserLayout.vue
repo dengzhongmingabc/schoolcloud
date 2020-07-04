@@ -22,7 +22,7 @@
           <a href="_self">条款</a>
         </div>
         <div class="copyright">
-          Copyright &copy; 2018 智能教培信息有限公司
+          Copyright &copy; 2020 智能教培信息有限公司
         </div>
       </div>
     </div>
