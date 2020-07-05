@@ -3,25 +3,43 @@
     <div class="table-page-search-wrapper">
       <a-form layout="inline">
         <a-row :gutter="48">
-          <a-col :md="8" :sm="24">
-            <a-form-item label="名称">
+          <a-col :xxl="4" :xl="6" :md="12" :sm="24" style="padding-right: 0px">
+            <a-form-item label="名称" >
               <a-input v-model="queryParam.name" placeholder=""/>
             </a-form-item>
           </a-col>
-          <a-col :md="8" :sm="24">
-            <a-form-item label="状态">
-              <a-select v-model="queryParam.invalid" placeholder="请选择" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="true">有效</a-select-option>
-                <a-select-option value="false">无效</a-select-option>
-              </a-select>
+
+          <a-col :xxl="5" :xl="7" :md="12" :sm="24" style="padding-right: 0px">
+            <a-form-item
+              label="起止日期">
+              <a-range-picker
+                name="buildTime"
+              />
             </a-form-item>
           </a-col>
 
-          <a-col :md="8" :sm="24">
+          <a-col :xxl="6" :xl="8" :md="12" :sm="24" style="padding-right: 0px">
+            <a-form-item label="状态" >
+                <a-radio-group default-value="" @change="$refs.table.refresh(true)"  v-model="queryParam.invalid" button-style="solid">
+                  <a-radio-button value="">
+                    全部
+                  </a-radio-button>
+                  <a-radio-button value="true">
+                    有效
+                  </a-radio-button>
+                  <a-radio-button value="false">
+                    无效
+                  </a-radio-button>
+                </a-radio-group>
+            </a-form-item>
+
+          </a-col>
+
+
+          <a-col :xxl="9" :xl="3" :md="12" :sm="24">
               <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
                 <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
+                <a-button style="margin-left: 8px" @click="() => {this.queryParam = {invalid:''};$refs.table.refresh(true)}">重置</a-button>
               </span>
           </a-col>
         </a-row>
@@ -45,6 +63,16 @@
       <span slot="invalid" slot-scope="invalid">
           {{invalid?'有效':'无效'}}
         </span>
+      <span slot="schools" slot-scope="schools">
+      <a-tag
+        v-for="(school,index) in schools"
+        :key="index"
+        :color="'green'"
+      >
+         {{ school.name}}
+      </a-tag>
+    </span>
+
       <span slot="action" slot-scope="text, record">
           <template>
             <a @click="handleEdit(record)">修改</a>
@@ -80,7 +108,7 @@
 <script>
   import moment from 'moment'
   import { STable, Ellipsis } from '@/components'
-  import { settingRolePermission,roleListPermission,getRolePageList,queryRoleDetail} from '@/api/sysManage'
+  import { settingRolePermission,roleListPermission,getRolePageList,queryRoleDetail,listPermission} from '@/api/sysManage'
 
   import CreateRoleForm from "./components/CreateRoleForm";
   import {saveRole} from "../../api/sysManage";
@@ -88,7 +116,7 @@
   import CreateRoleTreeForm from "./components/CreateRoleTreeForm";
 
   import {schoolQuery} from '@/api/school'
-
+  import {responseHandler} from '@/utils/responseHandler'
   const columns = [
     {
       title: '角色名称',
@@ -106,6 +134,12 @@
       dataIndex: 'createTime',
       width: '12%',
       sorter: true
+    },
+    {
+      title: '所属校区',
+      dataIndex: 'schools',
+      width: '20%',
+      scopedSlots: { customRender: 'schools' }
     },
     {
       title: '操作',
@@ -192,38 +226,52 @@
 
 
       handleAdd () {
-        schoolQuery().then((response)=>{
-          if(response.success){
-            this.mdl = {}
-            this.mdl.schools = response.result
-            this.visible = true
-          }
-        })
-      },
-      handleEdit (record) {
-        Promise.all([queryRoleDetail(record),schoolQuery()]).then((result) => {
+        Promise.all([listPermission(),schoolQuery()]).then((result) => {
           console.log(result);
-          this.mdl = {...record}
-          this.mdl.selectedSchool = result[0].result.schools
+          this.mdl = {}
+          this.mdl.result = result[0].result;
+          this.$refs.createModal.reloadRoleTree(this.mdl);
           this.mdl.schools = result[1].result
-          this.mdl.selectType = result[0].result.selectType+''
           this.visible = true
         }).catch((error) => {
           console.log(error)
         })
       },
+      handleEdit (record) {
+        const self = this;
+        let args = {}
+        args.roleId = record.id;
+        Promise.all([queryRoleDetail(record),schoolQuery(),roleListPermission(args)]).then((result) => {
+          console.log(result);
+          self.mdl = {...record}
+          self.mdl.selectedSchool = result[0].result.schools
+          self.mdl.schools = result[1].result
+          self.mdl.selectType = result[0].result.selectType+''
 
+
+          self.mdl.result = result[2].result;
+          self.mdl.roleId=record.id
+          self.$refs.createModal.reloadRoleTree(self.mdl);
+
+
+          self.visible = true
+        }).catch((error) => {
+          console.log(error)
+        })
+      },
       handleTreeOk (args) {
         this.visibleTree = false
         this.confirmLoadingTree = false
         this.$message.info('修改成功')
       },
 
-      handleOk (){
+      handleOk (args){
         const form = this.$refs.createModal.form
         this.confirmLoading = true
         form.validateFields((errors, values) => {
           if (!errors) {
+            values.id = args.roleId?args.roleId:0;
+            values.newpermissions = args.newpermissions
             values.schoolIdStr = values.selectedSchool&&values.selectedSchool.join(',')
             console.log('values', values)
             if (values.id > 0) {
@@ -262,8 +310,8 @@
       handleTreeCancel () {
         this.visibleTree = false
 
-       /* const form = this.$refs.createRoleTreeModal.form
-        form.resetFields() // 清理表单数据（可不做）*/
+        /* const form = this.$refs.createRoleTreeModal.form
+         form.resetFields() // 清理表单数据（可不做）*/
       },
       handleSub (record) {
         let self = this;
@@ -275,7 +323,7 @@
           self.mdlTree.roleId=record.id
           this.$refs.createRoleTreeModal.reloadTree(self.mdlTree);
           self.visibleTree = true
-         })
+        })
       },
       onSelectChange (selectedRowKeys, selectedRows) {
         this.selectedRowKeys = selectedRowKeys

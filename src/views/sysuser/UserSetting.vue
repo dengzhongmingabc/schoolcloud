@@ -198,7 +198,7 @@
           console.log('loadData request parameters:', requestParameters)
           return userPageList(requestParameters).then(res => {
 
-              if(responseHandler(res,true)){
+              if(responseHandler(res,false)){
                 return res.result
 
               }

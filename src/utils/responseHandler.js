@@ -4,8 +4,8 @@ import store from '@/store'
 import storage from 'store'
 
 export function responseHandler(response,noticeSuccess){
-  const code = response.code||response.result.code||0;
-  const message = response.message||response.result.message||'操作出错！';
+  const code = response.code||0;
+  const message = response.message||'操作出错！';
   if (code == 200){
     if(noticeSuccess){
       notification.success({
@@ -17,7 +17,7 @@ export function responseHandler(response,noticeSuccess){
   }else if(code==403){//没有权限
     notification.error({
       message: '错误提示',
-      description: message||'操作失败！'
+      description: message||'没有权限！'
     })
     return false;
   }else if(code==405){//会话过期

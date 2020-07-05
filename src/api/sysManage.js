@@ -9,6 +9,7 @@ const api = {
   rolePageList: '/sys/user/rolePageList',
   saveRole: '/sys/user/saveRole',
   roleListPermission: '/sys/user/roleListPermission',
+  listPermission: '/sys/user/listPermission',
   settingRolePermission: '/sys/user/settingRolePermission',
   editRoleBatch: '/sys/user/editRoleBatch',
   queryRoleDetail: '/sys/user/queryRoleDetail',
@@ -143,6 +144,14 @@ export function editSysUser (parameter) {
 export function queryRoleDetail (parameter) {
   return request({
     url: api.queryRoleDetail,
+    method: 'post',
+    params: parameter
+  })
+}
+
+export function listPermission (parameter) {
+  return request({
+    url: api.listPermission,
     method: 'post',
     params: parameter
   })

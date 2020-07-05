@@ -60,14 +60,10 @@ router.beforeEach((to, from, next) => {
         if(from.path===createSchool){
           let redirect = from.query.redirect
           let toRedirect = to.query.redirect
-          if(!redirect||toRedirect=='next'){
+          if(!redirect||redirect==='/'||redirect===createSchool||toRedirect=='next'){
             next()
           }else{
-            if(redirect==='/'||redirect===createSchool){
-              next({ path: defaultRoutePath })
-            }else{
-              next({ path: redirect, query: { redirect: 'next' } })
-            }
+            next({ path: redirect, query: { redirect: 'next' } })
           }
         }else{
           next()

@@ -9,7 +9,7 @@ import { ACCESS_TOKEN } from '@/store/mutation-types'
 const request = axios.create({
   // API 请求的默认前缀
   //baseURL: process.env.VUE_APP_API_BASE_URL,
-  baseURL: 'http://localhost:8899',
+  baseURL: 'http://192.168.1.8:8899',
   timeout: 6000 // 请求超时时间
 })
 

@@ -9,9 +9,9 @@
             <img src="~@/assets/logo.svg" class="logo" alt="logo"><span style="font-size: 16px">智能教培</span>
           </a-col>
           <a-col :span="12" class="colstype">
-            <span>15918395990</span>&nbsp;&nbsp;&nbsp;
+            <span>{{userInfo.name}}</span>&nbsp;&nbsp;&nbsp;
             <a-divider type="vertical"/>
-            <a href="">退出</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="#" @click="handleLogout">退出</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           </a-col>
 
         </a-row>
@@ -20,7 +20,7 @@
         <div class="head">
           <a-row type="flex" justify="space-around">
             <a-col :span="12" class="colleftstype">
-              <img src="~@/assets/user.svg" class="logo" alt="user"><span style="font-size: 14px">15918395990</span>
+              <img src="~@/assets/user.svg" class="logo" alt="user"><span style="font-size: 14px">{{userInfo.mobile?userInfo.mobile:userInfo.username}}</span>
             </a-col>
             <a-col :span="12" class="colstype">
               <a-button type="primary" @click="toSchoolAdd">
@@ -86,7 +86,8 @@
   import {schoolList,schoolAdd,schoolDelete,schoolIdSetting} from '@/api/school'
 
   import CreateSchoolForm from './CreateSchoolForm'
-
+  import {Modal} from "ant-design-vue";
+  import {mapActions, mapState} from 'vuex'
   export default {
     name: 'Article',
     components: {CreateSchoolForm},
@@ -102,7 +103,23 @@
     created() {
       this.reflushList();
     },
+    computed: {
+      ...mapState({
+        nickname: (state) => state.user.nickname,
+        welcome: (state) => state.user.welcome
+      }),
+      currentUser () {
+        return {
+          name: 'Serati Ma',
+          avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png'
+        }
+      },
+      userInfo () {
+        return this.$store.getters.userInfo
+      }
+    },
     methods: {
+      ...mapActions(['Login', 'Logout']),
       reflushList(){
         schoolList().then((response) => {
           this.schoolList = response.result;
@@ -113,6 +130,7 @@
         school.schoolId = schoolId;
         schoolIdSetting(school).then((response)=>{
           if(response.success){
+            console.log(this.$router)
             this.$router.push({path: '/dashboard/workplace'})
           }
         })
@@ -177,7 +195,33 @@
         const form = this.$refs.createUserModal.form
         form.resetFields() // 清理表单数据（可不做）
       },
+      handleLogout (e) {
+        Modal.confirm({
+          title: this.$t('提示'),
+          content: this.$t('您确定要退出吗？'),
+          onOk: () => {
+            return new Promise((resolve, reject) => {
+              /*setTimeout(Math.random() > 0.5 ? resolve : reject, 1500)
+              let data = {};
+              axios.post(`${this.$url}/test/testRequest`,data).then(res=>{
+                  console.log('res=>',res);
+              })*/
 
+              /*logout().then(response=>{
+                this.$router.red.push({ redirect: '/user/login' })
+              })*/
+
+              this.Logout().then(() => {
+                setTimeout(() => {
+                  window.location.reload()
+                }, 100)
+                resolve()
+              })
+            }).catch(() => console.log('Oops errors!'))
+          },
+          onCancel () {}
+        })
+      }
 
     }
   }

@@ -5,7 +5,7 @@
     :width="840"
     :visible="visible"
     :confirmLoading="loading"
-    @ok="() => { $emit('ok') }"
+    @ok="submitData"
     @cancel="() => { this.selectSchool=false;$emit('cancel') }"
   >
     <a-spin :spinning="loading">
@@ -18,14 +18,14 @@
           <a-input v-decorator="['roleName', { initialValue: model && model.roleName },{rules: [{required: true, min: 2, message: '请输入至少两个字符的规则描述！'}]}]" />
         </a-form-item>
         <a-form-item label="状态">
-            <a-radio-group button-style="solid" v-decorator="['invalid', { initialValue: model.invalid?(model.invalid+''):'true' }]">
-              <a-radio-button value='true'>
-                有效
-              </a-radio-button>
-              <a-radio-button value='false'>
-                无效
-              </a-radio-button>
-            </a-radio-group>
+          <a-radio-group button-style="solid" v-decorator="['invalid', { initialValue: model.invalid?(model.invalid+''):'true' }]">
+            <a-radio-button value='true'>
+              有效
+            </a-radio-button>
+            <a-radio-button value='false'>
+              无效
+            </a-radio-button>
+          </a-radio-group>
         </a-form-item>
         <a-form-item label="所属校区">
           <a-row>
@@ -55,60 +55,102 @@
             </a-col>
           </a-row>
         </a-form-item>
+        <a-form-item label="权限配置">
+          <a-row>
+            <a-card>
+              <a-tree v-if="reset"
+                checkable
+                :tree-data="allTreeData"
+                :default-checked-keys="allCheckedData"
+                :replace-fields="replaceFields"
+                @check="onCheck"
+              />
+            </a-card>
+          </a-row>
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
 </template>
 
 <script>
-import pick from 'lodash.pick'
+  import pick from 'lodash.pick'
 
-// 表单字段
-const fields = ['description', 'id','selectedSchool','selectType']
+  // 表单字段
+  const fields = ['description', 'id','selectedSchool','selectType']
 
-export default {
-  props: {
-    visible: {
-      type: Boolean,
-      required: true
-    },
-    loading: {
-      type: Boolean,
-      default: () => false
-    },
-    model: {
-      type: Object,
-      default: () => {}
-    }
-  },
-  data () {
-    this.formLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 7 }
+  export default {
+    props: {
+      visible: {
+        type: Boolean,
+        required: true
       },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 13 }
+      loading: {
+        type: Boolean,
+        default: () => false
+      },
+      model: {
+        type: Object,
+        default: () => {}
+      }
+    },
+    data () {
+      this.formLayout = {
+        labelCol: {
+          xs: { span: 24 },
+          sm: { span: 7 }
+        },
+        wrapperCol: {
+          xs: { span: 24 },
+          sm: { span: 13 }
+        }
+      }
+      return {
+        form: this.$form.createForm(this),
+        allCheckedData:[],
+        reset:true,
+        allTreeData:[],
+        replaceFields: {
+          key: 'id',
+          title: 'name'
+        },
+      }
+    },
+    created () {
+      console.log('custom modal created')
+
+      // 防止表单未注册
+      fields.forEach(v => this.form.getFieldDecorator(v))
+
+      // 当 model 发生改变时，为表单设置值
+      this.$watch('model', () => {
+        this.model && this.form.setFieldsValue(pick(this.model, fields))
+      })
+    },
+    methods:{
+      onCheck(checkedKeys, info) {
+        this.allCheckedData = [...checkedKeys,...info.halfCheckedKeys]
+        console.log(this.allCheckedData)
+        console.log('onCheck', checkedKeys, info);
+      },
+
+      reloadRoleTree(args){
+        console.log("----xxx---xx--",args);
+        this.allCheckedData = args.result.permissions
+        this.allTreeData = args.result.treeData
+        this.reset= false;
+        this.$nextTick(() => {
+          this.reset= true;
+        });
+        console.log("----xxx---xx--",this.allCheckedData);
+      },
+      submitData(){
+        let args = {}
+        args.roleId = this.model.roleId
+        args.newpermissions=this.allCheckedData.join(",")
+        console.log(args.newpermissions);
+        this.$emit('ok',args);
       }
     }
-    return {
-      form: this.$form.createForm(this),
-    }
-  },
-  created () {
-    console.log('custom modal created')
-
-    // 防止表单未注册
-    fields.forEach(v => this.form.getFieldDecorator(v))
-
-    // 当 model 发生改变时，为表单设置值
-    this.$watch('model', () => {
-      this.model && this.form.setFieldsValue(pick(this.model, fields))
-    })
-  },
-  methods:{
-
   }
-}
 </script>
