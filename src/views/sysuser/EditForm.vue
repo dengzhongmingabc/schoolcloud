@@ -1,7 +1,10 @@
 <template>
   <a-modal
+    :maskClosable="false"
+    cancelText="取消"
+    okText="确定"
     title="修改URL"
-    :width="440"
+    :width="640"
     :visible="visible"
     :confirmLoading="loading"
     @ok="() => { $emit('ok') }"

@@ -27,7 +27,7 @@ export function responseHandler(response,noticeSuccess){
       onOk() {
         setTimeout(() => {
           window.location.reload()
-        }, 1500)
+        }, 200)
       }
     })
     return false;

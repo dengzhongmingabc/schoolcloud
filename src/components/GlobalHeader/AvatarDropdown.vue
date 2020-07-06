@@ -70,7 +70,9 @@ export default {
 
             this.Logout().then(() => {
               setTimeout(() => {
-                window.location.reload()
+                console.log(this.$router)
+                this.$router.push({ path: '/user/login' })
+                //window.location.reload()
               }, 100)
               resolve()
             })

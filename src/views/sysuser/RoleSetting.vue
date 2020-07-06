@@ -197,7 +197,7 @@
           console.log('loadData request parameters--------:', requestParameters)
           return getRolePageList(requestParameters)
             .then(res => {
-              return res.result
+                return res.result
             })
         },
         selectedRowKeys: [],

@@ -1,34 +1,51 @@
 <template>
-    <a-card :bordered="false">
   <div>
-    <a-tabs default-active-key="1" @change="callback">
-      <a-tab-pane key="1" tab="用户设置">
-        <UserSetting/>
-      </a-tab-pane>
-      <a-tab-pane key="2" tab="角色设置" force-render>
-        <RoleSetting/>
-      </a-tab-pane>
-    </a-tabs>
+    <a-menu v-model="current" mode="horizontal" @openChange="onOpenChange">
+      <a-menu-item key="/sysusermanager/usermanage/userSetting">
+        <router-link :to="{ name: 'userSetting' }">
+          用户配置
+        </router-link>
+      </a-menu-item>
+      <a-menu-item key="/sysusermanager/usermanage/roleSetting">
+        <router-link :to="{ name: 'roleSetting' }">
+          角色配置
+        </router-link>
+      </a-menu-item>
+    </a-menu>
+    <div>
+      <route-view></route-view>
+    </div>
   </div>
-    </a-card>
 </template>
 <script>
-  import UserSetting from "./UserSetting";
-  import RoleSetting from "./RoleSetting";
-
-
+  import { RouteView } from '@/layouts'
   export default {
-    components:{
-      UserSetting,
-      RoleSetting
+    components: {
+      RouteView
     },
     data() {
-      return {};
+      return {
+        openKeys: [],
+        current: ['/sysusermanager/usermanage/userSetting'],
+      };
+    },
+    mounted () {
+      this.updateMenu()
     },
     methods: {
-      callback(key) {
-        console.log(key);
+      onOpenChange (openKeys) {
+        this.openKeys = openKeys
       },
+      updateMenu () {
+        const routes = this.$route.matched.concat()
+        this.current = [ routes.pop().path ]
+        console.log(this.current)
+      }
     },
+    watch: {
+      '$route' (val) {
+        this.updateMenu()
+      }
+    }
   };
 </script>

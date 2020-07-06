@@ -2,15 +2,15 @@ const responseBody = {
   message: '',
   timestamp: 0,
   result: null,
-  code: 0
+  code: 200
 }
 
-export const builder = (data, message, code = 0, headers = {}) => {
+export const builder = (data, message, code = 200, headers = {}) => {
   responseBody.result = data
   if (message !== undefined && message !== null) {
     responseBody.message = message
   }
-  if (code !== undefined && code !== 0) {
+  if (code !== undefined && code !== 200) {
     responseBody.code = code
     responseBody._status = code
   }

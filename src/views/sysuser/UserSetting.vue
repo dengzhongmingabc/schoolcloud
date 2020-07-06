@@ -12,8 +12,8 @@
               <a-form-item label="使用状态">
                 <a-select v-model="queryParam.invalid" placeholder="请选择" default-value="">
                   <a-select-option value="">全部</a-select-option>
-                  <a-select-option value="false">锁定</a-select-option>
-                  <a-select-option value="true">解锁</a-select-option>
+                  <a-select-option value="false">禁用</a-select-option>
+                  <a-select-option value="true">可用</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -24,7 +24,7 @@
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
-                <a-form-item label="用户名">
+                <a-form-item label="用户账号">
                   <a-input v-model="queryParam.userName" placeholder="请输入用户名"/>
                 </a-form-item>
               </a-col>
@@ -72,7 +72,7 @@
           {{ index + 1 }}
         </span>
         <span slot="invalid" slot-scope="invalid">
-          {{invalid?'解锁':'锁定'}}
+          {{invalid?'可用':'禁用'}}
         </span>
         <span slot="action" slot-scope="text, record">
           <template>
@@ -115,7 +115,7 @@
       dataIndex: 'realName',
     },
     {
-      title: '用户名',
+      title: '用户账号',
       dataIndex: 'userName',
     },
     {
@@ -184,25 +184,10 @@
         queryParam: {},
         // 加载数据方法 必须为 Promise 对象
         loadData: parameter => {
-
-        /*  const requestParameters = Object.assign({}, parameter, this.queryParam)
-          console.log('loadData request parameters:', requestParameters)
-          return this.$http.post('/sys/user/userPageList', {
-            params: requestParameters
-          }).then(res => {
-            console.log(res.result)
-            return res.result
-          })*/
-
           const requestParameters = Object.assign({}, parameter, this.queryParam)
           console.log('loadData request parameters:', requestParameters)
           return userPageList(requestParameters).then(res => {
-
-              if(responseHandler(res,false)){
-                return res.result
-
-              }
-
+            return res.result
             })
         },
         selectedRowKeys: [],

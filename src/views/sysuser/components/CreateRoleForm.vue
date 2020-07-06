@@ -1,6 +1,8 @@
 <template>
   <a-modal
     :maskClosable="false"
+    cancelText="取消"
+    okText="确定"
     title="角色编辑"
     :width="840"
     :visible="visible"
@@ -18,7 +20,7 @@
           <a-input v-decorator="['roleName', { initialValue: model && model.roleName },{rules: [{required: true, min: 2, message: '请输入至少两个字符的规则描述！'}]}]" />
         </a-form-item>
         <a-form-item label="状态">
-          <a-radio-group button-style="solid" v-decorator="['invalid', { initialValue: model.invalid?(model.invalid+''):'true' }]">
+          <a-radio-group button-style="solid"   v-decorator="['invalid', { initialValue: model.invalid != undefined?(model.invalid+''):'true' }]">
             <a-radio-button value='true'>
               有效
             </a-radio-button>

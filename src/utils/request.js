@@ -5,6 +5,7 @@ import notification from 'ant-design-vue/es/notification'
 import { VueAxios } from './axios'
 import { ACCESS_TOKEN } from '@/store/mutation-types'
 
+import {responseHandler} from './responseHandler'
 // 创建 axios 实例
 const request = axios.create({
   // API 请求的默认前缀
@@ -57,7 +58,10 @@ request.interceptors.request.use(config => {
 // response interceptor
 request.interceptors.response.use((response) => {
   console.log("请求返回的数据:",response)
-  return response.data
+  if(responseHandler(response.data,false)){
+    return response.data
+  }
+
 }, (error => {
   console.log("请求返回的错误信息：",error);
 }))

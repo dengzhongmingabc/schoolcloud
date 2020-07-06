@@ -1,6 +1,9 @@
 <template>
   <a-modal
-    title="新建规则"
+    :maskClosable="false"
+    cancelText="取消"
+    okText="确定"
+    title="资源配置"
     destroyOnClose
     :width="400"
     :visible="visible"

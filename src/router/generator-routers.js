@@ -55,6 +55,8 @@ const constantRouterComponents = {
 // 系统用户管理
   'PersionManage': () => import('@/views/sysuser/PerssionManage'),
   'UserManage': () => import('@/views/sysuser/UserManage'),
+  'UserSetting': () => import('@/views/sysuser/UserSetting'),
+  'RoleSetting': () => import('@/views/sysuser/RoleSetting'),
 
 
 
