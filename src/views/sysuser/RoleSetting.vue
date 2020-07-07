@@ -226,7 +226,7 @@
 
 
       handleAdd () {
-        Promise.all([listPermission(),schoolQuery()]).then((result) => {
+        Promise.all([roleListPermission(),schoolQuery()]).then((result) => {
           console.log(result);
           this.mdl = {}
           this.mdl.result = result[0].result;
@@ -283,7 +283,10 @@
                 // 刷新表格
                 this.$refs.table.refresh()
 
-                this.$message.info('修改成功')
+                if(response.success){
+                  this.$message.info('修改成功')
+                }
+
               })
             } else {
               saveRole(values).then(response =>{
@@ -294,7 +297,10 @@
                 // 刷新表格
                 this.$refs.table.refresh()
 
-                this.$message.info('新增成功')
+                if(response.success){
+                  this.$message.info('新增成功')
+                }
+
               })
             }
           } else {

@@ -33,7 +33,7 @@
         </a-form-item>
 
         <a-form-item v-show="false" label="isLeaf">
-          <a-input v-decorator="['isLeaf', { initialValue: model.isLeaf }]" disabled />
+          <a-input v-decorator="['isLeaf', { initialValue: model.leaf }]" disabled />
         </a-form-item>
         <a-form-item v-show="false" label="parentId">
           <a-input v-decorator="['parentId', { initialValue: model.parentId }]" disabled />

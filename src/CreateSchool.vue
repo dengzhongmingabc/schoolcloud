@@ -182,7 +182,9 @@
                 form.resetFields()
                 // 刷新表格
                 this.reflushList();
-                this.$message.info('新增成功')
+                if(response.success){
+                  this.$message.info('新增成功')
+                }
               })
             }
           } else {

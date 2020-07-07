@@ -4,6 +4,7 @@
     cancelText="取消"
     okText="确定"
     title="新建URL"
+    destroyOnClose
     :width="640"
     :visible="visible"
     :confirmLoading="loading"
@@ -12,26 +13,33 @@
   >
     <a-spin :spinning="loading">
       <a-form :form="form" v-bind="formLayout">
-        <!-- 检查是否有 id 并且大于0，大于0是修改。其他是新增，新增不显示主键ID -->
-        <a-form-item label="标题">
-          <a-input  v-decorator="['title',{rules: [{required: true, message: '名称不能为空！'}]}]" />
+        <a-form-item label="类型">
+          {{isbutton}}
+          <a-radio-group button-style="solid" @change="changeBtn" v-decorator="['isLeaf',{ initialValue: isbutton }]">
+            <a-radio-button value='false'>
+              页面
+            </a-radio-button>
+            <a-radio-button value='true'>
+              按钮
+            </a-radio-button>
+          </a-radio-group>
         </a-form-item>
-        <a-form-item label="组件">
+        <a-form-item label="标题">
+          <a-input  v-decorator="['title',{rules: [{required: true, message: '标题不能为空！'}]}]" />
+        </a-form-item>
+        <a-form-item v-if="isbutton=='false'" label="组件">
           <a-input v-decorator="['component',{rules: [{required: true}]}]" />
         </a-form-item>
         <a-form-item label="名称">
           <a-input v-decorator="['name', {rules: [{required: true}]}]" />
         </a-form-item>
-        <a-form-item label="跳转">
+        <a-form-item label="路径">
           <a-input v-decorator="['redirect',{rules: [{required: true, message: 'URL不能为空！'}]}]" />
         </a-form-item>
         <a-form-item label="图标">
           <a-input v-decorator="['icon',{rules: [{required: false}]}]" />
         </a-form-item>
 
-        <a-form-item v-show="false" label="isLeaf">
-          <a-input v-decorator="['isLeaf',{ initialValue: false }]" disabled />
-        </a-form-item>
         <a-form-item v-show="false" label="parentId">
           <a-input v-decorator="['parentId',{ initialValue: model&&model.parentId}]" disabled />
         </a-form-item>
@@ -72,8 +80,10 @@ export default {
         sm: { span: 13 }
       }
     }
+
     return {
-      form: this.$form.createForm(this)
+      form: this.$form.createForm(this),
+      isbutton:'true'
     }
   },
   created () {
@@ -86,6 +96,18 @@ export default {
     this.$watch('model', () => {
       this.model && this.form.setFieldsValue(pick(this.model, fields))
     })
+  },
+  methods:{
+    changeBtn(){
+      if(this.isbutton=='true'){
+        this.isbutton='false'
+        return
+      }
+      if(this.isbutton=='false'){
+        this.isbutton='true'
+        return
+      }
+    }
   }
 }
 </script>

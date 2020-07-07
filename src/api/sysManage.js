@@ -9,9 +9,7 @@ const api = {
   rolePageList: '/sys/user/rolePageList',
   saveRole: '/sys/user/saveRole',
   roleListPermission: '/sys/user/roleListPermission',
-  listPermission: '/sys/user/listPermission',
   settingRolePermission: '/sys/user/settingRolePermission',
-  editRoleBatch: '/sys/user/editRoleBatch',
   queryRoleDetail: '/sys/user/queryRoleDetail',
 
   userPageList: '/sys/user/userPageList',

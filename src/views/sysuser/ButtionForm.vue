@@ -1,38 +1,31 @@
 <template>
   <a-modal
-    title="Title"
+    :maskClosable="false"
+    cancelText="取消"
+    okText="确定"
+    title="新建URL"
+    :width="640"
     :visible="visible"
-    :confirm-loading="confirmLoading"
-    @ok="handleOk"
-    @cancel="handleCancel"
+    :confirmLoading="loading"
+    @ok="() => { $emit('ok') }"
+    @cancel="() => { $emit('cancel') }"
   >
     <a-spin :spinning="loading">
-      <a-form layout="inline" :form="form" @submit="handleSubmit">
-        <a-form-item>
-          <a-input
-            v-decorator="[
-          '按钮名',
-          { rules: [{ required: true, message: 'Please input your username!' }] },
-        ]"
-            placeholder="请按钮名"
-          >
-          </a-input>
+      <a-form :form="form" v-bind="formLayout">
+        <a-form-item label="标题">
+          <a-input  v-decorator="['title',{rules: [{required: true, message: '标题不能为空！'}]}]" />
         </a-form-item>
-        <a-form-item :validate-status="passwordError() ? 'error' : ''" :help="passwordError() || ''">
-          <a-input
-            v-decorator="[
-          'password',
-          { rules: [{ required: true, message: 'Please input your Password!' }] },
-        ]"
-            type="password"
-            placeholder="Password"
-          >
-          </a-input>
+        <a-form-item label="名称">
+          <a-input v-decorator="['name', {rules: [{required: true}]}]" />
         </a-form-item>
-        <a-form-item>
-          <a-button type="primary" html-type="submit" >
-            Log in
-          </a-button>
+        <a-form-item label="资源地址(url)">
+          <a-input v-decorator="['redirect',{rules: [{required: true, message: 'URL不能为空！'}]}]" />
+        </a-form-item>
+        <a-form-item v-show="false" label="isLeaf">
+          <a-input v-decorator="['isLeaf',{ initialValue: true }]" disabled />
+        </a-form-item>
+        <a-form-item v-show="false" label="parentId">
+          <a-input v-decorator="['parentId',{ initialValue: model&&model.parentId}]" disabled />
         </a-form-item>
       </a-form>
     </a-spin>
@@ -40,24 +33,51 @@
 </template>
 
 <script>
+  import pick from 'lodash.pick'
+
+  // 表单字段
+  const fields = ['description', 'id']
 
   export default {
-    name:'ButtonForm',
-    props:{
+    props: {
       visible: {
         type: Boolean,
         required: true
       },
+      loading: {
+        type: Boolean,
+        default: () => false
+      },
+      model: {
+        type: Object,
+        default: () => null
+      }
     },
-    data() {
+    data () {
+      this.formLayout = {
+        labelCol: {
+          xs: { span: 24 },
+          sm: { span: 7 }
+        },
+        wrapperCol: {
+          xs: { span: 24 },
+          sm: { span: 13 }
+        }
+      }
       return {
-      };
+        form: this.$form.createForm(this)
+      }
     },
-    mounted() {
+    created () {
+      console.log('custom modal created')
 
-    },
-    methods: {
+      // 防止表单未注册
+      fields.forEach(v => this.form.getFieldDecorator(v))
 
-    },
-  };
+      // 当 model 发生改变时，为表单设置值
+      this.$watch('model', () => {
+        this.model && this.form.setFieldsValue(pick(this.model, fields))
+      })
+    }
+  }
 </script>

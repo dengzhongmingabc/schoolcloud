@@ -13,6 +13,14 @@
         rowKey="id"
         showPagination="auto"
       >
+        <span slot="leaf" slot-scope="leaf" >
+          <a-tag v-if="leaf" :color="'green'" >
+             按钮
+          </a-tag>
+          <a-tag v-if="!leaf" :color="'red'" >
+             页面
+          </a-tag>
+        </span>
 
 
          <span slot="action" slot-scope="text, record">
@@ -28,9 +36,9 @@
             <a-menu-item>
               <a @click="addchildren(record)">增加子节点</a>
             </a-menu-item>
-            <a-menu-item>
-              <a @click="">增加按钮</a>
-            </a-menu-item>
+          <!--  <a-menu-item>
+              <a @click="handleButton(record)">增加按钮</a>
+            </a-menu-item>-->
           </a-menu>
         </a-dropdown>
       </span>
@@ -53,6 +61,14 @@
         @ok="ehandleOk"
       />
 
+      <button-form
+        ref="buttonModal"
+        :visible="bvisible"
+        :loading="bconfirmLoading"
+        :model="bmdl"
+        @cancel="bhandleCancel"
+        @ok="bhandleOk"
+      />
 
     </a-card>
   </page-header-wrapper>
@@ -91,10 +107,16 @@
       width: '8%',
     },
     {
-      title: '跳转',
+      title: '路径',
       dataIndex: 'url',
       width: '20%',
       key: 'url',
+    },
+    {
+      title: '类型',
+      dataIndex: 'leaf',
+      width: '20%',
+      scopedSlots: { customRender: 'leaf' }
     },
     {
       title: '操作',
@@ -110,7 +132,8 @@
     name: 'TableList',
     components: {
       AddForm,
-      EditForm
+      EditForm,
+      ButtonForm
     },
     data () {
       return {
@@ -120,9 +143,12 @@
         aconfirmLoading: false,
         evisible: false,
         econfirmLoading: false,
+        bvisible: false,
+        bconfirmLoading: false,
         tableloading:false,
         amdl: {},
         emdl: {},
+        bmdl: {},
         // 高级搜索 展开/关闭
         advanced: false,
         // 查询参数
@@ -138,11 +164,9 @@
       loadDataRefresh(){
         this.tableloading=true
         getPessionList().then(response => {
-          setTimeout(()=>{
             const result = response.result
             this.loadData = result;
             this.tableloading=false
-          },500)
         }).catch(error => {
           this.tableloading=false
         })
@@ -156,10 +180,17 @@
         this.evisible = true
         this.emdl = record
       },
+      handleButton (record) {
+        this.bvisible = true
+        let obj = {};
+        obj.parentId=record.id;
+        this.bmdl = obj
+      },
       addchildren (record) {
         this.avisible = true
         let obj = {};
         obj.parentId=record.id;
+        obj.level = record.level
         this.amdl = obj
       },
       ahandleOk () {
@@ -175,7 +206,9 @@
                 form.resetFields()
                 // 刷新表格
                 this.loadDataRefresh()
-                this.$message.info('新增成功')
+                if(response.success){
+                  this.$message.info('修改成功')
+                }
               })
             }else{
               // 新增
@@ -186,11 +219,34 @@
                 form.resetFields()
                 // 刷新表格
                 this.loadDataRefresh()
-                this.$message.info('新增成功')
+                if(response.success){
+                  this.$message.info('新增成功')
+                }
               })
             }
           } else {
             this.aconfirmLoading = false
+          }
+        })
+      },
+      bhandleOk () {
+        const form = this.$refs.buttonModal.form
+        this.aconfirmLoading = true
+        form.validateFields((errors, values) => {
+          if (!errors) {
+              // 新增
+              savePession(values).then(response =>{
+                this.bvisible = false
+                this.bconfirmLoading = false
+                // 重置表单数据
+                form.resetFields()
+                // 刷新表格
+                this.loadDataRefresh()
+                if(response.success)
+                  this.$message.info('新增成功')
+              })
+          } else {
+            this.bconfirmLoading = false
           }
         })
       },
@@ -206,7 +262,8 @@
               form.resetFields()
               // 刷新表格
               this.loadDataRefresh()
-              this.$message.info('修改成功')
+              if(response.success)
+                this.$message.info('修改成功')
             });
           } else {
             this.econfirmLoading = false
@@ -223,6 +280,11 @@
         const form = this.$refs.editModal.form
         form.resetFields() // 清理表单数据（可不做）
       },
+      bhandleCancel () {
+        this.bvisible = false
+        const form = this.$refs.buttonModal.form
+        form.resetFields() // 清理表单数据（可不做）
+      },
       handleDel (record) {
         let self = this;
         let contents = record.name+" "+record.url;
@@ -233,7 +295,8 @@
             deletePession(record).then(response =>{
               console.log(response);
               self.loadDataRefresh();
-              self.$message.info('删除成功！')
+              if(response.success)
+                self.$message.info('删除成功')
             })
           },
           onCancel() {}
@@ -244,7 +307,12 @@
         this.queryParam = {
           date: moment(new Date())
         }
+      },
+      tagClose(){
+        console.log("---------------------------------sss")
+        return ;
       }
+
     }
   }
 </script>
