@@ -44,7 +44,7 @@
       </div>
 
       <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
+        <a-button type="primary" v-action:saveSysUser disabled icon="plus" @click="handleAdd">新建</a-button>
         <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
           <a-menu slot="overlay">
             <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
@@ -76,9 +76,9 @@
         </span>
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)">编辑</a>
+            <a v-action:editSysUser disabled @click="handleEdit(record)">编辑</a>
             <a-divider type="vertical" />
-            <a @click="deleteSysUser(record)">删除</a>
+            <a v-action:deleteSysUser disabled @click="deleteSysUser(record)">删除</a>
           </template>
         </span>
       </s-table>

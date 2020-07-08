@@ -2,7 +2,7 @@
   <page-header-wrapper>
     <a-card :bordered="false">
       <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
+        <a-button type="primary" icon="plus" v-action:add disabled @click="handleAdd">新建</a-button>
       </div>
       <a-table
         :columns="columns"
@@ -23,18 +23,18 @@
         </span>
 
 
-         <span slot="action" slot-scope="text, record">
-                   <a @click="handleEdit(record)">编辑</a>
+         <span slot="action"   slot-scope="text, record">
+                   <a v-action:edit disabled @click="handleEdit(record)">编辑</a>
         <a-divider type="vertical" />
         <a-dropdown>
           <a class="ant-dropdown-link">更多 <a-icon type="down" />
           </a>
           <a-menu slot="overlay">
             <a-menu-item>
-              <a @click="handleDel(record)">删除</a>
+              <a v-action:deletePession disabled @click="handleDel(record)">删除</a>
             </a-menu-item>
             <a-menu-item>
-              <a @click="addchildren(record)">增加子节点</a>
+              <a v-action:add disabled @click="addchildren(record)">增加子节点</a>
             </a-menu-item>
           <!--  <a-menu-item>
               <a @click="handleButton(record)">增加按钮</a>

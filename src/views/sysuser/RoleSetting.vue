@@ -47,7 +47,7 @@
     </div>
 
     <div class="table-operator">
-      <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
+      <a-button type="primary" icon="plus" v-action:saveRole disabled @click="handleAdd">新建</a-button>
     </div>
 
     <s-table
@@ -75,9 +75,9 @@
 
       <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)">修改</a>
+            <a v-action:saveRole disabled @click="handleEdit(record)">修改</a>
             <a-divider type="vertical" />
-            <a @click="handleSub(record)">配置权限</a>
+            <a v-action:settingRolePermission disabled @click="handleSub(record)">配置权限</a>
           </template>
         </span>
     </s-table>
