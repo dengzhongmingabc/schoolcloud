@@ -86,7 +86,7 @@
       title: '标题',
       dataIndex: 'title',
       key: 'title',
-      width: '10%',
+      width: '15%',
     },
     {
       title: '名称',
@@ -115,7 +115,7 @@
     {
       title: '类型',
       dataIndex: 'leaf',
-      width: '20%',
+      width: '5%',
       scopedSlots: { customRender: 'leaf' }
     },
     {

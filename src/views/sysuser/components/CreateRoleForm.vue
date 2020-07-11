@@ -20,11 +20,11 @@
           <a-input v-decorator="['roleName', { initialValue: model && model.roleName },{rules: [{required: true, min: 2, message: '请输入至少两个字符的规则描述！'}]}]" />
         </a-form-item>
         <a-form-item label="状态">
-          <a-radio-group button-style="solid"   v-decorator="['invalid', { initialValue: model.invalid != undefined?(model.invalid+''):'true' }]">
-            <a-radio-button value='true'>
+          <a-radio-group button-style="solid"   v-decorator="['isLock', { initialValue: model.isLock != undefined?(model.isLock+''):'false' }]">
+            <a-radio-button value='false'>
               有效
             </a-radio-button>
-            <a-radio-button value='false'>
+            <a-radio-button value='true'>
               无效
             </a-radio-button>
           </a-radio-group>

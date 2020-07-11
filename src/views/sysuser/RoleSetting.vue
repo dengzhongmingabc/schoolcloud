@@ -20,14 +20,14 @@
 
           <a-col :xxl="6" :xl="8" :md="12" :sm="24" style="padding-right: 0px">
             <a-form-item label="状态" >
-                <a-radio-group default-value="" @change="$refs.table.refresh(true)"  v-model="queryParam.invalid" button-style="solid">
+                <a-radio-group default-value="" @change="$refs.table.refresh(true)"  v-model="queryParam.isLock" button-style="solid">
                   <a-radio-button value="">
                     全部
                   </a-radio-button>
-                  <a-radio-button value="true">
+                  <a-radio-button value="false">
                     有效
                   </a-radio-button>
-                  <a-radio-button value="false">
+                  <a-radio-button value="true">
                     无效
                   </a-radio-button>
                 </a-radio-group>
@@ -39,7 +39,7 @@
           <a-col :xxl="9" :xl="3" :md="12" :sm="24">
               <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
                 <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-                <a-button style="margin-left: 8px" @click="() => {this.queryParam = {invalid:''};$refs.table.refresh(true)}">重置</a-button>
+                <a-button style="margin-left: 8px" @click="() => {this.queryParam = {isLock:''};$refs.table.refresh(true)}">重置</a-button>
               </span>
           </a-col>
         </a-row>
@@ -60,8 +60,8 @@
       :rowSelection="rowSelection"
       showPagination="auto"
     >
-      <span slot="invalid" slot-scope="invalid">
-          {{invalid?'有效':'无效'}}
+      <span slot="isLock" slot-scope="isLock">
+          {{isLock?'无效':'有效'}}
         </span>
       <span slot="schools" slot-scope="schools">
       <a-tag
@@ -125,9 +125,9 @@
     },
     {
       title: '状态',
-      dataIndex: 'invalid',
+      dataIndex: 'isLock',
       width: '8%',
-      scopedSlots: { customRender: 'invalid' }
+      scopedSlots: { customRender: 'isLock' }
     },
     {
       title: '创建时间',

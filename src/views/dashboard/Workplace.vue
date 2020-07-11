@@ -10,7 +10,6 @@
             {{ timeFix }}，{{ user.name }}<span class="welcome-text">，{{ welcome }}</span>
           </div>
           <div>前端工程师 | 蚂蚁金服 - 某某某事业群 - VUE平台</div>
-          <a-button v-action:add disabled>删除用户</a-button>
         </div>
       </div>
     </template>

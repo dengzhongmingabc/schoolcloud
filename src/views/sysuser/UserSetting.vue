@@ -10,10 +10,10 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="使用状态">
-                <a-select v-model="queryParam.invalid" placeholder="请选择" default-value="">
+                <a-select v-model="queryParam.isLock" placeholder="请选择" default-value="">
                   <a-select-option value="">全部</a-select-option>
-                  <a-select-option value="false">禁用</a-select-option>
-                  <a-select-option value="true">可用</a-select-option>
+                  <a-select-option value="false">可用</a-select-option>
+                  <a-select-option value="true">禁用</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -71,8 +71,8 @@
         <span slot="serial" slot-scope="text, record, index">
           {{ index + 1 }}
         </span>
-        <span slot="invalid" slot-scope="invalid">
-          {{invalid?'可用':'禁用'}}
+        <span slot="isLock" slot-scope="isLock">
+          {{isLock?'禁用':'可用'}}
         </span>
         <span slot="action" slot-scope="text, record">
           <template>
@@ -128,8 +128,8 @@
     },
     {
       title: '状态',
-      dataIndex: 'invalid',
-      scopedSlots: { customRender: 'invalid' }
+      dataIndex: 'isLock',
+      scopedSlots: { customRender: 'isLock' }
     },
     {
       title: '更新时间',

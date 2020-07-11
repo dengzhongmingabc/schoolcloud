@@ -66,11 +66,11 @@
 
 
         <a-form-item label="状态">
-          <a-radio-group button-style="solid" v-decorator="['invalid', { initialValue: 'true' }]">
-            <a-radio-button value='true'>
+          <a-radio-group button-style="solid" v-decorator="['isLock', { initialValue: model.isLock != undefined?(model.isLock+''):'false' }]">
+            <a-radio-button value='false'>
               可用
             </a-radio-button>
-            <a-radio-button value='false'>
+            <a-radio-button value='true'>
               禁用
             </a-radio-button>
           </a-radio-group>
