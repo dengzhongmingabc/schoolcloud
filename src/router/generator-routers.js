@@ -59,6 +59,12 @@ const constantRouterComponents = {
   'RoleSetting': () => import('@/views/sysuser/RoleSetting'),
 
 
+  // 教务中心
+  'CourseManager': () => import('@/views/teach/course/courseManager'),
+  'CourseSetting': () => import('@/views/teach/course/courseSetting'),
+  'CourseTypeSetting': () => import('@/views/teach/course/courseTypeSetting'),
+
+
 
   'TestWork': () => import(/* webpackChunkName: "TestWork" */ '@/views/dashboard/TestWork'),
 

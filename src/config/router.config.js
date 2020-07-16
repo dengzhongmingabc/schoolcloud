@@ -372,5 +372,4 @@ export const constantRouterMap = [
     path: '/createSchool',
     component: () => import('@/CreateSchool')
   }
-
 ]
