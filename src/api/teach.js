@@ -7,6 +7,7 @@ const api = {
   courseEdit: '/teachCourse/edit',
   courseDelete: '/teachCourse/delete',
   courseQuery: '/teachCourse/query',
+  courseList: '/teachCourse/list',
 
   courseTypePageList: '/teachCourseType/pageList',
   courseTypeSave: '/teachCourseType/save',
@@ -26,7 +27,13 @@ export function coursePageList (parameter) {
     params: parameter
   })
 }
-
+export function courseList (parameter) {
+  return request({
+    url: api.courseList,
+    method: 'post',
+    params: parameter
+  })
+}
 export function courseSave (parameter) {
   return request({
     url: api.courseSave,

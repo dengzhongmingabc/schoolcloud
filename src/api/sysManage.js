@@ -18,6 +18,7 @@ const api = {
   roleList: '/sys/user/roleList',
   detailSysUser: '/sys/user/detailSysUser',
   editSysUser: '/sys/user/editSysUser',
+  userList: '/sysUser/list',
 }
 
 export default api
@@ -97,6 +98,13 @@ export function editRoleBatch (parameter) {
 export function userPageList (parameter) {
   return request({
     url: api.userPageList,
+    method: 'post',
+    params: parameter
+  })
+}
+export function userList (parameter) {
+  return request({
+    url: api.userList,
     method: 'post',
     params: parameter
   })

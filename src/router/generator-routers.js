@@ -65,6 +65,12 @@ const constantRouterComponents = {
   'CourseTypeSetting': () => import('@/views/teach/course/courseTypeSetting'),
 
 
+  //招生中心
+  'SeekManager': () => import('@/views/market/SeekManager'),
+  'Seek': () => import('@/views/market/Seek'),
+  'TalkStudent': () => import('@/views/market/TalkStudent'),
+
+
 
   'TestWork': () => import(/* webpackChunkName: "TestWork" */ '@/views/dashboard/TestWork'),
 

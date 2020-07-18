@@ -112,10 +112,10 @@
         <a-form-item label="状态">
           <a-radio-group button-style="solid"   v-decorator="['forbidden', { initialValue: model.forbidden != undefined?(model.forbidden+''):'false' }]">
             <a-radio-button value='false'>
-              有效
+              开售
             </a-radio-button>
             <a-radio-button value='true'>
-              无效
+              下架
             </a-radio-button>
           </a-radio-group>
         </a-form-item>

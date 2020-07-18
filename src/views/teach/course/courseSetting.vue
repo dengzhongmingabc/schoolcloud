@@ -55,7 +55,7 @@
           {{ index + 1 }}
         </span>
       <span slot="forbidden" slot-scope="forbidden">
-          {{forbidden?'无效':'有效'}}
+          {{forbidden?'下架':'开售'}}
       </span>
       <span slot="payModel" slot-scope="payModel">
           {{payModel.payType==1?'按课时':'按期'}}
@@ -217,10 +217,7 @@
         })
       },
       handleOk() {
-
-
         let payJson = this.$refs.createCourseForm.payJson
-
         const form = this.$refs.createCourseForm.form
         this.confirmLoading = true
         form.validateFields((errors, values) => {
