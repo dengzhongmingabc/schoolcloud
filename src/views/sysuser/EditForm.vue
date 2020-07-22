@@ -32,6 +32,16 @@
           <a-input v-decorator="['icon', { initialValue: model.icon },{rules: [{required: false}]}]" />
         </a-form-item>
 
+        <a-form-item label="显示">
+          <a-radio-group button-style="solid" v-decorator="['isShow',{ initialValue: 'true' }]">
+            <a-radio-button value='true'>
+              显示
+            </a-radio-button>
+            <a-radio-button value='false'>
+              隐藏
+            </a-radio-button>
+          </a-radio-group>
+        </a-form-item>
         <a-form-item v-show="false" label="isLeaf">
           <a-input v-decorator="['isLeaf', { initialValue: model.leaf }]" disabled />
         </a-form-item>
@@ -47,7 +57,7 @@
 import pick from 'lodash.pick'
 
 // 表单字段
-const fields = ['description', 'id']
+const fields = ['description', 'id','isShow']
 
 export default {
   props: {

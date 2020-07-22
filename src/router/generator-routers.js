@@ -71,6 +71,12 @@ const constantRouterComponents = {
   'TalkStudent': () => import('@/views/market/TalkStudent'),
 
 
+  //办理中心
+  'Handler': () => import('@/views/handler/Handler'),
+  'FillFee': () => import('@/views/handler/FillFee'),
+  'SignRenew': () => import('@/views/handler/SignRenew'),
+
+
 
   'TestWork': () => import(/* webpackChunkName: "TestWork" */ '@/views/dashboard/TestWork'),
 

@@ -14,7 +14,6 @@
     <a-spin :spinning="loading">
       <a-form :form="form" v-bind="formLayout">
         <a-form-item label="类型">
-          {{isbutton}}
           <a-radio-group button-style="solid" @change="changeBtn" v-decorator="['isLeaf',{ initialValue: isbutton }]">
             <a-radio-button value='false'>
               页面
@@ -42,6 +41,17 @@
 
         <a-form-item v-show="false" label="parentId">
           <a-input v-decorator="['parentId',{ initialValue: model&&model.parentId}]" disabled />
+        </a-form-item>
+
+        <a-form-item label="显示">
+          <a-radio-group button-style="solid" v-decorator="['isShow',{ initialValue: 'true' }]">
+            <a-radio-button value='true'>
+              显示
+            </a-radio-button>
+            <a-radio-button value='false'>
+              隐藏
+            </a-radio-button>
+          </a-radio-group>
         </a-form-item>
       </a-form>
     </a-spin>

@@ -60,16 +60,6 @@
         @cancel="ehandleCancel"
         @ok="ehandleOk"
       />
-
-      <button-form
-        ref="buttonModal"
-        :visible="bvisible"
-        :loading="bconfirmLoading"
-        :model="bmdl"
-        @cancel="bhandleCancel"
-        @ok="bhandleOk"
-      />
-
     </a-card>
   </page-header-wrapper>
 </template>
@@ -79,7 +69,6 @@
   import { getPessionList,savePession,deletePession,editPession } from '@/api/sysManage'
   import AddForm from  './AddForm'
   import EditForm from "./EditForm";
-  import ButtonForm from './ButtionForm'
 
   const columns = [
     {
@@ -132,8 +121,7 @@
     name: 'TableList',
     components: {
       AddForm,
-      EditForm,
-      ButtonForm
+      EditForm
     },
     data () {
       return {
@@ -143,12 +131,10 @@
         aconfirmLoading: false,
         evisible: false,
         econfirmLoading: false,
-        bvisible: false,
-        bconfirmLoading: false,
+
         tableloading:false,
         amdl: {},
         emdl: {},
-        bmdl: {},
         // 高级搜索 展开/关闭
         advanced: false,
         // 查询参数
@@ -173,18 +159,13 @@
       },
 
       handleAdd () {
-        this.amdl = null
+        this.amdl = {}
         this.avisible = true
       },
       handleEdit (record) {
-        this.evisible = true
         this.emdl = record
-      },
-      handleButton (record) {
-        this.bvisible = true
-        let obj = {};
-        obj.parentId=record.id;
-        this.bmdl = obj
+        this.emdl.isShow = record.show+''
+        this.evisible = true
       },
       addchildren (record) {
         this.avisible = true
@@ -198,6 +179,7 @@
         this.aconfirmLoading = true
         form.validateFields((errors, values) => {
           if (!errors) {
+            values.show = values.isShow
             if(values.parentId>0){
               savePession(values).then(response =>{
                 this.avisible = false
@@ -229,32 +211,12 @@
           }
         })
       },
-      bhandleOk () {
-        const form = this.$refs.buttonModal.form
-        this.aconfirmLoading = true
-        form.validateFields((errors, values) => {
-          if (!errors) {
-              // 新增
-              savePession(values).then(response =>{
-                this.bvisible = false
-                this.bconfirmLoading = false
-                // 重置表单数据
-                form.resetFields()
-                // 刷新表格
-                this.loadDataRefresh()
-                if(response.success)
-                  this.$message.info('新增成功')
-              })
-          } else {
-            this.bconfirmLoading = false
-          }
-        })
-      },
       ehandleOk () {
         const form = this.$refs.editModal.form
         this.econfirmLoading = true
         form.validateFields((errors, values) => {
           if (!errors) {
+            values.show = values.isShow
             editPession(values).then(response => {
               this.evisible = false
               this.econfirmLoading = false
@@ -280,11 +242,7 @@
         const form = this.$refs.editModal.form
         form.resetFields() // 清理表单数据（可不做）
       },
-      bhandleCancel () {
-        this.bvisible = false
-        const form = this.$refs.buttonModal.form
-        form.resetFields() // 清理表单数据（可不做）
-      },
+
       handleDel (record) {
         let self = this;
         let contents = record.name+" "+record.url;
