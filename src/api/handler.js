@@ -3,6 +3,7 @@ import request from '@/utils/request'
 const api = {
   //课程
   handlerPageList: '/handler/pageList',
+  handlerPageListByJPQL: '/handler/pageListByJPQL',
   handlerSave: '/handler/save',
   handlerEdit: '/handler/edit',
   handlerDelete: '/handler/delete',
@@ -22,6 +23,13 @@ export function handlerPageList (parameter) {
   })
 }
 
+export function handlerPageListByJPQL (parameter) {
+  return request({
+    url: api.handlerPageListByJPQL,
+    method: 'post',
+    params: parameter
+  })
+}
 
 export function handlerSave (parameter) {
   return request({

@@ -23,12 +23,12 @@ import './global.less'
 
 
 import {Tree} from 'ant-design-vue'
-
+import Print from 'vue-print-nb'
 Vue.config.productionTip = false
 
 
 
-
+Vue.use(Print);
 
 // mount axios to `Vue.$http` and `this.$http`
 Vue.use(VueAxios)

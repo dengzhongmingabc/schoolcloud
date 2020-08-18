@@ -88,6 +88,8 @@
   import CreateSchoolForm from './CreateSchoolForm'
   import {Modal} from "ant-design-vue";
   import {mapActions, mapState} from 'vuex'
+  import store from "./store";
+  import router from "./router";
   export default {
     name: 'Article',
     components: {CreateSchoolForm},
@@ -130,8 +132,10 @@
         school.schoolId = schoolId;
         schoolIdSetting(school).then((response)=>{
           if(response.success){
-            console.log(this.$router)
-            this.$router.push({path: '/dashboard/workplace'})
+            store.dispatch('GetInfo').then(res => {
+              console.log(this.$router)
+              this.$router.push({path: '/dashboard/workplace'})
+            })
           }
         })
       },

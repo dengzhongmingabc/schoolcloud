@@ -51,6 +51,7 @@
 
 
     <s-table
+      :scroll="{ x: 1300 }"
       ref="table"
       size="default"
       rowKey="id"
@@ -60,18 +61,44 @@
       :rowSelection="rowSelection"
       showPagination="auto"
     >
-        <span slot="serial" slot-scope="text, record, index">
-          {{ index + 1 }}
-        </span>
+      <span slot="marketStudent" slot-scope="cellData">
+          {{cellData.studentName}}
+      </span>
+      <span slot="mobile" slot-scope="cellData">
+          {{cellData.mobile}}
+      </span>
+      <span slot="orderType" slot-scope="cellData">
+          {{orderTypeMap[cellData].text}}
+      </span>
+      <span slot="orderContent" slot-scope="cellData">
+        <ellipsis :length="10" tooltip>{{ cellData }}</ellipsis>
+      </span>
       <span slot="forbidden" slot-scope="forbidden">
           {{forbidden?'无效':'有效'}}
       </span>
       <span slot="action" slot-scope="text, record">
-          <template>
-            <a @click="handleEdit(record)">编辑</a>
-            <a-divider type="vertical"/>
-            <a @click="handlerDelete(record)">删除</a>
-          </template>
+          <a @click="handleEdit(record)">详情</a>
+        <a-divider type="vertical" />
+        <a-dropdown>
+          <a class="ant-dropdown-link">更多 <a-icon type="down" />
+          </a>
+          <a-menu slot="overlay">
+            <a-menu-item>
+              <a-popconfirm
+                title="您确定要作废吗?"
+                @confirm="() => handlerRabish(record)"
+              >
+              <a  href="javascript:;" ref="handlerRabish">作废</a>
+              </a-popconfirm>
+            </a-menu-item>
+            <a-menu-item>
+              <a  @click="print(record)">打印</a>
+            </a-menu-item>
+            <!--  <a-menu-item>
+                <a @click="handleButton(record)">增加按钮</a>
+              </a-menu-item>-->
+          </a-menu>
+        </a-dropdown>
         </span>
     </s-table>
 
@@ -94,27 +121,67 @@
 <script>
   import moment from 'moment'
   import {STable, Ellipsis} from '@/components'
-  import {handlerSave, handlerDelete, handlerPageList, handlerQuery, handlerEdit} from '@/api/handler'
+  import {handlerSave, handlerDelete, handlerPageList,handlerPageListByJPQL, handlerQuery, handlerEdit} from '@/api/handler'
 
   import CreateHandlerForm from "./components/CreateHandlerForm";
 
   const columns = [
     {
-      title: '#',
-      scopedSlots: {customRender: 'serial'}
-    },
-    {
       title: '订单号',
       dataIndex: 'orderNo',
+      ellipsis: true,
+      fixed: 'left',
+    },
+    {
+      title: '学生姓名',
+      dataIndex: 'marketStudent',
+      fixed: 'left',
+      scopedSlots: {customRender: 'marketStudent'}
+    },
+    {
+      title: '联系方式',
+      dataIndex: 'marketStudent',
+      scopedSlots: {customRender: 'mobile'}
+    },
+
+    {
+      title: '订单类型',
+      dataIndex: 'orderType',
+      scopedSlots: {customRender: 'orderType'}
+    },
+    {
+      title: '交易记录',
+      dataIndex: 'orderContent',
+      scopedSlots: {customRender: 'orderContent'}
+    },
+
+    {
+      title: '应收/应退',
+      dataIndex: 'orderMoney',
+    },
+    {
+      title: '实收/实退',
+      dataIndex: 'getOrderMoneyReality',
+    },
+    {
+      title: '欠费',
+      dataIndex: 'oweUp',
     },
     {
       title: '状态',
       dataIndex: 'forbidden',
       scopedSlots: {customRender: 'forbidden'}
     },
+
     {
-      title: '更新时间',
+      title: '经办人',
+      dataIndex: 'creater',
+      ellipsis: true,
+    },
+    {
+      title: '经办时间',
       dataIndex: 'createdDate',
+      ellipsis: true,
       sorter: true
     },
     {
@@ -152,13 +219,25 @@
           console.log(requestParameters['name']);
           let search = '';
           if (requestParameters['name']) {
-            search += ' and name like \'%' + requestParameters['name'] + '%\''
+            search += ' and obj.marketStudent.studentName like \'%' + requestParameters['name'] + '%\''
           }
           if (requestParameters['forbidden']) {
-            search += ' and forbidden=' + requestParameters['forbidden']
+            search += ' and obj.forbidden=' + requestParameters['forbidden']
           }
           requestParameters.search = search;
-          return handlerPageList(requestParameters).then(res => {
+          return handlerPageListByJPQL(requestParameters).then(res => {
+            console.log(res.result);
+            let result = [];
+            for(var data of res.result.data){
+              let content = '';
+              for(let table of data.orderContent){
+                for(let record of table){
+                  content += `${record.xname}x${record.number}=${record.mintotal},`
+                }
+              }
+              data.orderContent = content
+              result.push(data)
+            }
             return res.result
           })
         },
@@ -167,6 +246,7 @@
         size:'default',
         visibledrawer: false,
         placement: 'top',
+        orderTypeMap: { 1: {text: '报名'},2: {text: '续费'}, 3: {text: '补费'}, 4: {text: '转课'}, 5: {text: '退费'}, 5: {text: '资料'}, 5: {text: '积分'}},
       }
     },
     filters: {
@@ -189,6 +269,21 @@
       }
     },
     methods: {
+      print(record){
+        let params = {};
+        params.id = record.id;
+        handlerQuery(params).then((response)=>{
+          this.$router.push({name:'voucher',params:{record:response.result}})
+        })
+      },
+      handlerRabish(record){
+        let params = {};
+        params.id = record.id;
+        params.forbidden=true;
+        handlerEdit(params).then((response)=>{
+          this.$refs.table.refresh(true)
+        })
+      },
       handleAdd(record) {
         this.mdl = {}
         this.visible = true

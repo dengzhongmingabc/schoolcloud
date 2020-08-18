@@ -1,11 +1,11 @@
 <template>
   <page-header-wrapper>
-    <a-form :form="form" v-bind="formLayout">
+    <a-form v-bind="formLayout">
       <a-card :bordered="false" class="parent" style="margin-bottom: 8px;height: 60px;">
         <a-row>
           <a-col :span="8">
-            <a-button type="primary">
-              <a-icon type="left-circle"/>
+            <a-button type="primary" @click="returnHandler">
+              <a-icon type="left-circle" />
               返回
             </a-button>
           </a-col>
@@ -13,23 +13,28 @@
       </a-card>
 
       <a-card title="学生信息" :bordered="false" style="margin-bottom: 8px;">
-        <a-select
-          slot="extra"
-          show-search
-          label-in-value
-          :value="value"
-          placeholder="请输入名称或者手机号码"
-          style="width: 200px"
-          :filter-option="false"
-          :not-found-content="fetching ? undefined : null"
-          @search="fetchUser"
-          @change="handleChange"
-        >
-          <a-spin v-if="fetching" slot="notFoundContent" size="small"/>
-          <a-select-option v-for="(da,index) in data" :key="da.id">
-            {{ da.studentName }}
-          </a-select-option>
-        </a-select>
+        <template slot="extra">
+          <a-select
+            show-search
+            label-in-value
+            :value="value"
+            placeholder="请输入名称或者手机号码"
+            style="width: 200px"
+            :filter-option="false"
+            :not-found-content="fetching ? undefined : null"
+            @search="fetchUser"
+            @change="handleChange"
+          >
+            <a-spin v-if="fetching" slot="notFoundContent" size="small"/>
+            <a-select-option v-for="(da,index) in data" :key="da.id">
+              {{ da.studentName }}
+            </a-select-option>
+          </a-select>
+          <a-button type="primary" @click="()=>this.$router.push({path:'/market/seekManager/seek'})">
+            新建学员
+          </a-button>
+        </template>
+
 
         <div class="studentInfo">
           <span class="studentName">
@@ -44,76 +49,166 @@
         </div>
       </a-card>
 
-      <a-card title="课程与班级" :bordered="false" style="margin-bottom: 8px;height: 590px;">
+      <a-card title="课程与班级" :bordered="false" style="margin-bottom: 8px;min-height: 290px;">
         <div slot="extra">
-          <a-button type="primary" style="margin-left: 10px">
+          <a-button type="primary" @click="toAddCourse" style="margin-left: 10px">
             选择课程
           </a-button>
           <a-button type="primary" style="margin-left: 10px">
             选择班级
           </a-button>
         </div>
-        <a-table :columns="columns" :data-source="tableData" bordered :pagination="false">
-          <template slot="name" slot-scope="text">
+        <a-table :columns="columns"
+                 rowKey="key"
+                 v-for="(table,index) in tables"
+                 :data-source="table"
+                 bordered
+                 :pagination="false"
+                 style="margin-bottom: 10px"
+                 :key="index"
+        >
+          <template slot="name" slot-scope="text, record">
             <a>{{ text }}</a>
           </template>
 
-          <a-select default-value="lucy" slot="price" style="width: 120px" @change="handleChange">
-            <a-select-option value="jack">
-              Jack
-            </a-select-option>
 
-            <a-select-option value="Yiminghe">
-              yiminghe
-            </a-select-option>
-          </a-select>
+          <template slot="price" slot-scope="price, record">
+            <a-select v-if="price.data!=undefined" :default-value="price.data[0].totalPrice" style="width: 120px"
+                      @change="(value)=>changePrice(record,value)">
+              <a-select-option :value="ps.totalPrice" v-for="(ps,index) in price.data">
+                {{'￥'+ps.totalPrice+'('+ps.number+'节)'}}
+              </a-select-option>
+            </a-select>
+            <span v-if="price.data==undefined">
+              {{price}}
+            </span>
+          </template>
 
-          <a-input-number :min="1" :max="100000" slot="number" :default-value="1" @change="onChange" />
-
+          <a-input-number :min="1" :max="100" slot="number" slot-scope="text,record" :default-value="1"
+                          @change="(value)=>numberChange(record,value)"/>
 
           <template slot="operation" slot-scope="text, record">
-            <a href="javascript:;" @click="handleAdd">增加</a>
+            <a href="javascript:;" @click="handleAdd(record)">增加</a>
             <a-divider type="vertical"/>
             <a-popconfirm
-              v-if="tableData.length"
+              v-if="table.length"
               title="Sure to delete?"
-              @confirm="() => onDelete(record.key)"
+              @confirm="() => onDelete(record)"
             >
-              <a href="javascript:;" ref="delete" :disabled="tableData.length<2">删除</a>
+              <a href="javascript:;" ref="delete" :disabled="record.price.data!=undefined">删除</a>
             </a-popconfirm>
           </template>
 
           <template slot="title" slot-scope="currentPageData">
-            钢琴
+            {{table[0].xname}}
           </template>
           <template slot="footer" slot-scope="currentPageData">
-            合计
+            合计{{'('+table[0].addUp+')'}}
           </template>
         </a-table>
 
-
       </a-card>
 
-      <a-card :bordered="false" style="margin-bottom: 8px;height: 60px;">
+      <a-card title="经办信息" :bordered="false" style="margin-bottom: 8px;min-height: 100px;">
+        <a-form :form="form" v-bind="formLayout">
+          <a-row :gutter="24">
+            <a-col :span="12">
+              <a-form-item label="经办校区" :label-col="{ span: 4 }" :wrapper-col="{ span: 16 }">
+                <a-select
+                  v-decorator="['seekSchoolId',{ initialValue: this.$store.getters.userInfo.currentSchoolId }, {rules: [{ required: false, message: 'Please select your gender!' }]} ]">
+                  <a-select-option v-for="(item,index) in mdl.schools" :value="item.id" :label="item.name" :key="index">
+                    {{item.name}}
+                  </a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="经办人" :label-col="{ span: 4 }" :wrapper-col="{ span: 16 }">
+                <a-input  v-decorator="[ 'creater',{ initialValue: this.$store.getters.userInfo.name },  {rules: [{ required: false, message: 'Please input your note!' }]}]"
+                         disabled/>
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <!--<a-row :gutter="24">
+            <a-col :span="12">
+              <a-form-item label="主销售人" :label-col="{ span: 4 }" :wrapper-col="{ span: 16 }">
+                <a-select
+                  v-decorator="['marketPersonFirstId',{rules: [{ required: false, message: 'Please select your gender!' }]}]">
+                  <a-select-option v-for="(item,index) in mdl.users" :value="item.id" :label="item.realName"
+                                   :key="index">
+                    {{item.realName}}
+                  </a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="副销售人" :label-col="{ span: 4 }" :wrapper-col="{ span: 16 }">
+                <a-select
+                  v-decorator="[  'marketPersonSecondId', {rules: [{ required: false, message: 'Please select your gender!' }]} ]">
+                  <a-select-option v-for="(item,index) in mdl.users" :value="item.id" :label="item.realName"
+                                   :key="index">
+                    {{item.realName}}
+                  </a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+          </a-row>-->
+        </a-form>
       </a-card>
 
-      <a-card :bordered="false" style="margin-bottom: 8px;height: 190px;">
+      <a-card :bordered="false" style="margin-bottom: 8px;height: 64px;">
+        <div slot="extra">
+          <span style="margin-right: 32px">
+            应收：{{'(￥'+totalUp+')'}}
+          </span>
+          <span style="margin-right: 32px">
+            实收：<a-input-number :min="0" :max="1000000" v-model="realyUp" @change=""/>
+          </span>
+          <span>
+            欠费：{{'(￥'+oweUp+')'}}
+          </span>
+
+
+          <a-button type="primary" style="margin-left: 10px" @click="saveOrder">
+            确定
+          </a-button>
+        </div>
       </a-card>
     </a-form>
+    <SelectCourse
+      ref="selectCourse"
+      :visible="visible"
+      :loading="confirmLoading"
+      :model="mdl"
+      @cancel="handleCancel"
+      @ok="handleOk"
+    />
   </page-header-wrapper>
 </template>
 
 <script>
   import debounce from 'lodash/debounce';
   import {marketStudentList} from '@/api/market'
+  import SelectCourse from "./components/SelectCourse";
+
+  import {courseList} from '@/api/teach'
+  import {userList} from '@/api/sysManage'
+  import {schoolQuery} from '@/api/school'
+  import {handlerSave} from '@/api/handler'
+  import notification from 'ant-design-vue/es/notification'
 
   const columns = [
     {
-      title: '收费项目',
+      title: '项目类型',
       dataIndex: 'name',
+      scopedSlots: {customRender: 'name'},
     },
     {
-      title: '收费模式',
+      title: '项目名称',
+      dataIndex: 'xname'
+    },
+    {
+      title: '收费标准',
       dataIndex: 'price',
       scopedSlots: {customRender: 'price'},
     },
@@ -137,26 +232,13 @@
       scopedSlots: {customRender: 'operation'},
     },
   ];
-  const tableData = [
-    {
-      key: '1',
-      name: '课程费用',
-      price: 200,
-      number: '1',
-      prefer: '100',
-      mintotal: '100',
-    },
-    {
-      key: '2',
-      name: '教材费用',
-      price: 200,
-      number: '1',
-      prefer: '100',
-      mintotal: '100',
+
+
+  export default {
+    components: {
+      SelectCourse
     },
 
-  ];
-  export default {
     data() {
       this.formLayout = {
         labelCol: {
@@ -167,13 +249,18 @@
           xs: {span: 24},
           sm: {span: 20}
         }
-      }
+      };
+
       this.lastFetchId = 0;
       this.fetchUser = debounce(this.fetchUser, 800);
       return {
-        tableData,
+        form: this.$form.createForm(this),
+        visible: false,
+        confirmLoading: false,
+        mdl: {roles: []},
         columns,
         count: 5,
+        tableId: 1,
         data: [],
         value: [],
         fetching: false,
@@ -182,9 +269,145 @@
         seekModelMap: {1: {text: '来电'}, 2: {text: '来访'}, 3: {text: '网络'}, 4: {text: '其它'}},
         statusMap: {1: {text: '待跟进'}, 2: {text: '跟进中'}, 3: {text: '已邀约'}, 4: {text: '已邀约'}, 5: {text: '已失效'}},
         sexMap: {1: {text: '男'}, 2: {text: '女'}, 3: {text: '未知'}},
-      };
+        tables: [],
+        realyUp: 0
+      }
+    },
+    created() {
+      Promise.all([courseList(), schoolQuery(), userList()]).then((result) => {
+        console.log(result);
+        this.mdl = {}
+        this.mdl.courses = result[0].result;
+        this.mdl.schools = result[1].result
+        this.mdl.users = result[2].result
+      }).catch((error) => {
+        console.log(error)
+      })
+    },
+    computed: {
+      totalUp: function () {
+        let allUp = 0;
+        let tableIndex = 0
+        let table = this.tables[tableIndex];
+        for (; tableIndex < this.tables.length; tableIndex++) {
+          table = this.tables[tableIndex];
+          allUp += table[0].addUp
+        }
+        this.realyUp = allUp
+        return allUp;
+      },
+      oweUp: function () {
+        return this.totalUp - this.realyUp;
+      }
     },
     methods: {
+      saveOrder() {
+        if(!this.studentInfo.id){
+          notification.error({
+            message: '错误提示',
+            description: '请选择用户信息'
+          })
+          return
+        }
+        if(this.tables.length<1){
+          notification.error({
+            message: '错误提示',
+            description: '请选择课程'
+          })
+          return
+        }
+        let value = {}
+        value.studentId = this.studentInfo.id
+        value.orderType = 1
+        value.orderContent = this.tables
+        value.orderMoney = this.totalUp
+        value.getOrderMoneyReality = this.realyUp
+        value.oweUp = this.oweUp
+        value.remark = ""
+        const param = JSON.stringify(value);
+        handlerSave(param).then((response) => {
+          console.log(param)
+          console.log(response)
+          //this.$router.push({path:'/handler/handler'})
+          this.$router.push({name:'voucher',params:{record:response.result}})
+        })
+
+      },
+
+      returnHandler(){
+        this.$router.push({path:'/handler/handler'})
+      },
+
+      addUp(tables, argsrecord) {
+        let tableIndex = 0
+        let recordIndex = 0
+        let table = tables[tableIndex];
+        f:for (; tableIndex < tables.length; tableIndex++) {
+          table = tables[tableIndex];
+          recordIndex = 0
+          s:for (; recordIndex < table.length; recordIndex++) {
+            if (table[recordIndex].key == argsrecord.key) {
+              break f;
+              break s;
+            }
+          }
+        }
+        let record2 = table[0]
+        let addUp = 0;
+        let index = 0
+        for (; index < table.length; index++) {
+          let record = table[index];
+          addUp += record.mintotal;
+        }
+        record2.addUp = addUp
+        this.editTables(tables, record2)
+      },
+      editTables(tables, record) {
+        let tableIndex = 0
+        let recordIndex = 0
+        let table = tables[tableIndex];
+        f:for (; tableIndex < tables.length; tableIndex++) {
+          table = tables[tableIndex];
+          recordIndex = 0
+          s:for (; recordIndex < table.length; recordIndex++) {
+            if (table[recordIndex].key == record.key) {
+              break f;
+              break s;
+            }
+          }
+        }
+        console.log(table)
+        console.log(tableIndex)
+        console.log(recordIndex)
+        table.splice(recordIndex, 1, record);
+        this.tables.splice(tableIndex, 1, table);
+      },
+      numberChange(record, value) {
+        if (record.price.data) {//如果是课程（主）
+          record.mintotal = record.priceCurrent * value - record.prefer
+        } else {
+          record.mintotal = record.price * value - record.prefer
+        }
+        record.number = value;
+        const {tables} = this;
+
+        console.log('record', record)
+        console.log('tables', tables)
+        this.editTables(tables, record)
+        this.addUp(tables, record)
+      },
+      changePrice(record, value) {
+        console.log(record)
+
+        record.priceCurrent = value
+        record.mintotal = record.priceCurrent * record.number - record.prefer
+        const {tables} = this;
+        this.editTables(tables, record)
+        this.addUp(tables, record)
+      },
+      toAddCourse(record) {
+        this.visible = true
+      },
       fetchUser(value) {
         console.log('fetching user', value);
         this.lastFetchId += 1;
@@ -213,25 +436,110 @@
           fetching: false,
         });
       },
-      onDelete(key) {
-        const tableData = [...this.tableData];
-        this.tableData = tableData.filter(item => item.key !== key);
-      },
-      handleAdd() {
-        const {count, tableData} = this;
-        const newData = {
-          key: '3',
-          name: '教材费用',
-          price: 200,
-          number: '1',
-          prefer: '100',
-          mintotal: '100',
+      onDelete(record) {
+        console.log(record)
+        const {tables} = this;
+        console.log(tables);
+        var index = 0
+        let table = tables[index];
+        for (; index < tables.length; index++) {
+          console.log(tables[index]);
+          if (tables[index][0].tableId == record.tableId) {
+            table = tables[index];
+            break;
+          }
         }
-        this.tableData = [...tableData, newData];
-        this.count = count + 1;
+        let tableData = table.filter(item => item.key !== record.key);
+        this.tables.splice(index, 1, tableData);
+
+        this.addUp(tables, record)
+        /*const tableData = [...this.tableData];
+        this.tableData = tableData.filter(item => item.key !== key);*/
+      },
+      handleAdd(record) {
+        console.log(record)
+        console.log(record.tableId)
+
+        const {tables} = this;
+        console.log(tables);
+        var index = 0
+        let table = tables[index];
+        for (; index < tables.length; index++) {
+          console.log(tables[index]);
+          if (tables[index][0].tableId == record.tableId) {
+            table = tables[index];
+            break;
+          }
+        }
+        console.log(table)
+        console.log(index)
+        let data = {
+          key: Math.random(),
+          tableId: record.tableId,
+          name: '教材杂费',
+          xname: '书本',
+          price: 80,
+          number: 1,
+          prefer: 10,
+          mintotal: 70
+        }
+        table = [...table, data]
+        this.tables.splice(index, 1, table);
+        this.addUp(tables, record)
+      },
+      handleOk() {
+        const targetDatas = this.$refs.selectCourse.targetDatas
+        console.log("yyy", targetDatas)
+
+        let jiaoji = this.tables.filter((item) => {
+          for (var i = 0; i < targetDatas.length; i++) {
+            if (targetDatas[i].key == item[0].key) {
+              return true
+            }
+          }
+          return false
+        })
+
+        console.log("jiaoji", jiaoji)
+        let tableAdd = targetDatas.filter((item) => {
+          if (jiaoji.length < 1) {
+            return true
+          }
+          for (var a = 0; a < jiaoji.length; a++) {
+            if (jiaoji[a][0].key != item.key) {
+              return true
+            }
+          }
+          return false
+        })
+        console.log("tableAdd", tableAdd)
+        this.tables = [...jiaoji];
+        for (var data of tableAdd) {
+          this.tableId = this.tableId + 1
+          const table = []
+          let d = {};
+          d.key = data.key
+          d.tableId = this.tableId
+          d.xname = data.title
+          d.name = '课程'
+          d.prefer = 100
+          d.number = 1
+          d.price = data.payModel;
+          // d.numberCurrent = d.number
+          d.priceCurrent = d.price.data[0].totalPrice
+          d.mintotal = d.priceCurrent * d.number - d.prefer;
+          d.addUp = d.mintotal
+          table.push(d);
+          this.tables.push(table);
+        }
+        console.log(this.tables)
+        this.visible = false
+      },
+      handleCancel() {
+        this.visible = false
       },
     },
-  };
+  }
 </script>
 
 <style scoped>

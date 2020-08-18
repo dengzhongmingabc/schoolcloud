@@ -75,6 +75,7 @@ const constantRouterComponents = {
   'Handler': () => import('@/views/handler/Handler'),
   'FillFee': () => import('@/views/handler/FillFee'),
   'SignRenew': () => import('@/views/handler/SignRenew'),
+  'Voucher': () => import('@/views/handler/Voucher'),
 
 
 
