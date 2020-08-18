@@ -75,7 +75,7 @@
           <template slot="price" slot-scope="price, record">
             <a-select v-if="price.data!=undefined" :default-value="price.data[0].totalPrice" style="width: 120px"
                       @change="(value)=>changePrice(record,value)">
-              <a-select-option :value="ps.totalPrice" v-for="(ps,index) in price.data">
+              <a-select-option :value="ps.totalPrice" v-for="(ps,index) in price.data" :key="index" >
                 {{'￥'+ps.totalPrice+'('+ps.number+'节)'}}
               </a-select-option>
             </a-select>

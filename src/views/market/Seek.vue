@@ -79,7 +79,7 @@
         <ellipsis :length="10" tooltip>{{ celldata }}</ellipsis>
       </span>
       <span slot="seekCourse" slot-scope="celldata">
-        <a-tag :color="'green'" v-for="(item,index) in celldata" >{{item.name}}</a-tag>
+        <a-tag :color="'green'" v-for="(item,index) in celldata" :key="index">{{item.name}}</a-tag>
       </span>
       <span slot="forbidden" slot-scope="forbidden">
           {{forbidden?'无效':'有效'}}
