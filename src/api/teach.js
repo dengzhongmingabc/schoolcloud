@@ -1,6 +1,13 @@
 import request from '@/utils/request'
 
 const api = {
+  classesPageList: '/teachClasses/pageList',
+  classesSave: '/teachClasses/save',
+  classesEdit: '/teachClasses/edit',
+  classesDelete: '/teachClasses/delete',
+  classesQuery: '/teachClasses/query',
+  classesList: '/teachClasses/list',
+
   //课程
   coursePageList: '/teachCourse/pageList',
   courseSave: '/teachCourse/save',
@@ -8,6 +15,9 @@ const api = {
   courseDelete: '/teachCourse/delete',
   courseQuery: '/teachCourse/query',
   courseList: '/teachCourse/list',
+  noClassSelectStudentList: '/teachClasses/noClassSelectStudentList',
+  studentAddToClass: '/teachClasses/studentAddToClass',
+
 
   courseTypePageList: '/teachCourseType/pageList',
   courseTypeSave: '/teachCourseType/save',
@@ -15,10 +25,65 @@ const api = {
   courseTypeDelete: '/teachCourseType/delete',
   courseTypeQuery: '/teachCourseType/query',
   courseTypeList: '/teachCourseType/list',
+
+
+
+
 }
 
 export default api
 
+export function classesPageList (parameter) {
+  return request({
+    url: api.classesPageList,
+    method: 'post',
+    params: parameter
+  })
+}
+export function classesList (parameter) {
+  return request({
+    url: api.classesList,
+    method: 'post',
+    params: parameter
+  })
+}
+export function classesSave (parameter) {
+  return request({
+    url: api.classesSave,
+    method: 'post',
+    data: parameter,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
+
+export function classesEdit (parameter) {
+  return request({
+    url: api.classesEdit,
+    method: 'post',
+    data: parameter,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
+
+export function classesDelete (parameter) {
+  return request({
+    url: api.classesDelete,
+    method: 'post',
+    params: parameter
+  })
+}
+
+export function classesQuery (parameter) {
+  return request({
+    url: api.classesQuery,
+    method: 'post',
+    params: parameter
+  })
+}
 //--------------------------------------------------------课程
 export function coursePageList (parameter) {
   return request({
@@ -67,6 +132,22 @@ export function courseDelete (parameter) {
 export function courseQuery (parameter) {
   return request({
     url: api.courseQuery,
+    method: 'post',
+    params: parameter
+  })
+}
+
+export function noClassSelectStudentList (parameter) {
+  return request({
+    url: api.noClassSelectStudentList,
+    method: 'post',
+    params: parameter
+  })
+}
+
+export function studentAddToClass (parameter) {
+  return request({
+    url: api.studentAddToClass,
     method: 'post',
     params: parameter
   })

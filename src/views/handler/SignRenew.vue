@@ -54,7 +54,7 @@
           <a-button type="primary" @click="toAddCourse" style="margin-left: 10px">
             选择课程
           </a-button>
-          <a-button type="primary" style="margin-left: 10px">
+          <a-button type="primary" @click="toAddClass" style="margin-left: 10px">
             选择班级
           </a-button>
         </div>
@@ -73,9 +73,9 @@
 
 
           <template slot="price" slot-scope="price, record">
-            <a-select v-if="price.data!=undefined" :default-value="price.data[0].totalPrice" style="width: 120px"
+            <a-select v-if="price.data!=undefined" :default-value="price.data[0].totalPrice+'|'+price.data[0].number" style="width: 120px"
                       @change="(value)=>changePrice(record,value)">
-              <a-select-option :value="ps.totalPrice" v-for="(ps,index) in price.data" :key="index" >
+              <a-select-option :value="ps.totalPrice+'|'+ps.number" v-for="(ps,index) in price.data" :key="index" >
                 {{'￥'+ps.totalPrice+'('+ps.number+'节)'}}
               </a-select-option>
             </a-select>
@@ -99,8 +99,19 @@
             </a-popconfirm>
           </template>
 
+
           <template slot="title" slot-scope="currentPageData">
             {{table[0].xname}}
+            <a-select
+              style="width: 150px;margin-left: 10px"
+              placeholder="班级选择"
+              option-label-prop="label"
+              @change="(value)=>changeClass(table[0],value)"
+            >
+              <a-select-option v-for="(item,index) in table[0].tableclasses" :value="item.id" :label="item.name" :key="index" >
+                {{item.name}}
+              </a-select-option>
+            </a-select>
           </template>
           <template slot="footer" slot-scope="currentPageData">
             合计{{'('+table[0].addUp+')'}}
@@ -183,6 +194,15 @@
       @cancel="handleCancel"
       @ok="handleOk"
     />
+
+    <SelectClass
+      ref="selectClass"
+      :visible="classVisible"
+      :loading="classConfirmLoading"
+      :model="classMdl"
+      @cancel=""
+      @ok=""
+    />
   </page-header-wrapper>
 </template>
 
@@ -190,8 +210,9 @@
   import debounce from 'lodash/debounce';
   import {marketStudentList} from '@/api/market'
   import SelectCourse from "./components/SelectCourse";
+  import SelectClass from "./components/SelectClass";
 
-  import {courseList} from '@/api/teach'
+  import {courseList,classesList} from '@/api/teach'
   import {userList} from '@/api/sysManage'
   import {schoolQuery} from '@/api/school'
   import {handlerSave} from '@/api/handler'
@@ -236,7 +257,8 @@
 
   export default {
     components: {
-      SelectCourse
+      SelectCourse,
+      SelectClass
     },
 
     data() {
@@ -255,6 +277,11 @@
       this.fetchUser = debounce(this.fetchUser, 800);
       return {
         form: this.$form.createForm(this),
+
+        classVisible: false,
+        classConfirmLoading: false,
+        classMdl: {},
+
         visible: false,
         confirmLoading: false,
         mdl: {roles: []},
@@ -270,7 +297,8 @@
         statusMap: {1: {text: '待跟进'}, 2: {text: '跟进中'}, 3: {text: '已邀约'}, 4: {text: '已邀约'}, 5: {text: '已失效'}},
         sexMap: {1: {text: '男'}, 2: {text: '女'}, 3: {text: '未知'}},
         tables: [],
-        realyUp: 0
+        realyUp: 0,
+
       }
     },
     created() {
@@ -301,6 +329,19 @@
       }
     },
     methods: {
+      changeClass(record, value) {
+        console.log("this.tables1",this.tables)
+        console.log(record)
+        console.log(value)
+
+        record.currentClass = value
+        const {tables} = this;
+        this.editTables(tables, record)
+        console.log("this.tables2",this.tables)
+      },
+      toAddClass(record) {
+        this.classVisible = true
+      },
       saveOrder() {
         if(!this.studentInfo.id){
           notification.error({
@@ -399,8 +440,10 @@
       changePrice(record, value) {
         console.log(record)
 
-        record.priceCurrent = value
+        record.priceCurrent = value.split("|")[0]
         record.mintotal = record.priceCurrent * record.number - record.prefer
+        record.courseCount = value.split("|")[1]
+
         const {tables} = this;
         this.editTables(tables, record)
         this.addUp(tables, record)
@@ -488,52 +531,69 @@
         this.addUp(tables, record)
       },
       handleOk() {
-        const targetDatas = this.$refs.selectCourse.targetDatas
-        console.log("yyy", targetDatas)
+        let requestParameters = {}
+        classesList(requestParameters).then(res => {
+          console.log("res.result",res.result)
+          let classData = res.result
+          const targetDatas = this.$refs.selectCourse.targetDatas
+          console.log("yyy", targetDatas)
 
-        let jiaoji = this.tables.filter((item) => {
-          for (var i = 0; i < targetDatas.length; i++) {
-            if (targetDatas[i].key == item[0].key) {
+          let jiaoji = this.tables.filter((item) => {
+            for (var i = 0; i < targetDatas.length; i++) {
+              if (targetDatas[i].key == item[0].key) {
+                return true
+              }
+            }
+            return false
+          })
+
+          console.log("jiaoji", jiaoji)
+          let tableAdd = targetDatas.filter((item) => {
+            if (jiaoji.length < 1) {
               return true
             }
+            for (var a = 0; a < jiaoji.length; a++) {
+              if (jiaoji[a][0].key != item.key) {
+                return true
+              }
+            }
+            return false
+          })
+          console.log("tableAdd", tableAdd)
+          this.tables = [...jiaoji];
+          for (var data of tableAdd) {
+            this.tableId = this.tableId + 1
+            const table = []
+            let d = {};
+            d.key = data.key
+            d.tableId = this.tableId
+            d.xname = data.title
+            d.name = '课程'
+            d.prefer = 100
+            d.number = 1
+            d.price = data.payModel;
+            // d.numberCurrent = d.number
+            d.priceCurrent = d.price.data[0].totalPrice
+            d.courseCount = d.price.data[0].number
+            d.mintotal = d.priceCurrent * d.number - d.prefer;
+            d.addUp = d.mintotal
+            d.tableclasses = classData.filter((item)=>{
+              console.log("item.teachCourse.id",item.teachCourse.id)
+              console.log("data.key",data.key)
+              return item.teachCourse.id==data.key
+            });
+
+            console.log("d.tableclasses",d.tableclasses)
+            d.currentClass = ''
+            table.push(d);
+            this.tables.push(table);
           }
-          return false
+          console.log(this.tables)
+          this.visible = false
         })
 
-        console.log("jiaoji", jiaoji)
-        let tableAdd = targetDatas.filter((item) => {
-          if (jiaoji.length < 1) {
-            return true
-          }
-          for (var a = 0; a < jiaoji.length; a++) {
-            if (jiaoji[a][0].key != item.key) {
-              return true
-            }
-          }
-          return false
-        })
-        console.log("tableAdd", tableAdd)
-        this.tables = [...jiaoji];
-        for (var data of tableAdd) {
-          this.tableId = this.tableId + 1
-          const table = []
-          let d = {};
-          d.key = data.key
-          d.tableId = this.tableId
-          d.xname = data.title
-          d.name = '课程'
-          d.prefer = 100
-          d.number = 1
-          d.price = data.payModel;
-          // d.numberCurrent = d.number
-          d.priceCurrent = d.price.data[0].totalPrice
-          d.mintotal = d.priceCurrent * d.number - d.prefer;
-          d.addUp = d.mintotal
-          table.push(d);
-          this.tables.push(table);
-        }
-        console.log(this.tables)
-        this.visible = false
+
+
       },
       handleCancel() {
         this.visible = false
