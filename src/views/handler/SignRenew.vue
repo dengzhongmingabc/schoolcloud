@@ -101,14 +101,14 @@
 
 
           <template slot="title" slot-scope="currentPageData">
-            {{table[0].xname}}
+            {{table[0].xname+'('+courseTypeMap[table[0].teachType].text+')'}}
             <a-select
               style="width: 150px;margin-left: 10px"
-              placeholder="班级选择"
+              placeholder="班级或老师选择"
               option-label-prop="label"
               @change="(value)=>changeClass(table[0],value)"
             >
-              <a-select-option v-for="(item,index) in table[0].tableclasses" :value="item.id" :label="item.name" :key="index" >
+              <a-select-option v-for="(item,index) in table[0].classesOrTeachers" :value="item.id" :label="item.name" :key="index" >
                 {{item.name}}
               </a-select-option>
             </a-select>
@@ -296,6 +296,7 @@
         seekModelMap: {1: {text: '来电'}, 2: {text: '来访'}, 3: {text: '网络'}, 4: {text: '其它'}},
         statusMap: {1: {text: '待跟进'}, 2: {text: '跟进中'}, 3: {text: '已邀约'}, 4: {text: '已邀约'}, 5: {text: '已失效'}},
         sexMap: {1: {text: '男'}, 2: {text: '女'}, 3: {text: '未知'}},
+        courseTypeMap: {1: {text: '一对一'}, 2: {text: '班级'}},
         tables: [],
         realyUp: 0,
 
@@ -334,7 +335,7 @@
         console.log(record)
         console.log(value)
 
-        record.currentClass = value
+        record.currentClassOrTeacher = value
         const {tables} = this;
         this.editTables(tables, record)
         console.log("this.tables2",this.tables)
@@ -532,9 +533,9 @@
       },
       handleOk() {
         let requestParameters = {}
-        classesList(requestParameters).then(res => {
-          console.log("res.result",res.result)
-          let classData = res.result
+        Promise.all([classesList(requestParameters),userList()]).then((result) => {
+          let classData = result[0].result
+          let teacherData = result[1].result
           const targetDatas = this.$refs.selectCourse.targetDatas
           console.log("yyy", targetDatas)
 
@@ -577,21 +578,35 @@
             d.courseCount = d.price.data[0].number
             d.mintotal = d.priceCurrent * d.number - d.prefer;
             d.addUp = d.mintotal
-            d.tableclasses = classData.filter((item)=>{
-              console.log("item.teachCourse.id",item.teachCourse.id)
-              console.log("data.key",data.key)
-              return item.teachCourse.id==data.key
-            });
+            d.teachType = data.teachType
 
-            console.log("d.tableclasses",d.tableclasses)
-            d.currentClass = ''
+            //如果是一对一，老师列表，如果是班级课程，班级列表
+            if(data.teachType == 1){
+              d.classesOrTeachers = teacherData.map((item)=>{
+                let teacher = {};
+                teacher.id = item.id
+                teacher.name = item.realName;
+                return teacher
+              })
+            }else{
+              d.classesOrTeachers = classData.filter((item)=>{
+                console.log("item.teachCourse.id",item.teachCourse.id)
+                console.log("data.key",data.key)
+                return item.teachCourse.id==data.key
+              });
+            }
+
+
+            console.log("d.classesOrTeachers",d.classesOrTeachers)
+            d.currentClassOrTeacher = ''
             table.push(d);
             this.tables.push(table);
           }
           console.log(this.tables)
           this.visible = false
+        }).catch((error) => {
+          console.log(error)
         })
-
 
 
       },

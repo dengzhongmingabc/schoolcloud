@@ -116,6 +116,7 @@
             d.key = data.id.toString();
             d.description = data.name
             d.payModel = data.payModel
+            d.teachType = data.teachType;
             mockData.push(d);
           }
         })

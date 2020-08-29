@@ -1,6 +1,16 @@
 import request from '@/utils/request'
 
 const api = {
+  //一对一
+  oneByOnePageList: '/teachOneByOne/pageList',
+  oneByOnePageListJPQL: '/teachOneByOne/pageListByJPQL',
+  oneByOneSave: '/teachOneByOne/save',
+  oneByOneEdit: '/teachOneByOne/edit',
+  oneByOneDelete: '/teachOneByOne/delete',
+  oneByOneQuery: '/teachOneByOne/query',
+  oneByOneList: '/teachOneByOne/list',
+  oneByOneListByJPQL: '/teachOneByOne/listByJPQL',
+//班级
   classesPageList: '/teachClasses/pageList',
   classesSave: '/teachClasses/save',
   classesEdit: '/teachClasses/edit',
@@ -18,7 +28,7 @@ const api = {
   noClassSelectStudentList: '/teachClasses/noClassSelectStudentList',
   studentAddToClass: '/teachClasses/studentAddToClass',
 
-
+//课程类型
   courseTypePageList: '/teachCourseType/pageList',
   courseTypeSave: '/teachCourseType/save',
   courseTypeEdit: '/teachCourseType/edit',
@@ -32,7 +42,73 @@ const api = {
 }
 
 export default api
+//一对一
+export function oneByOnePageList (parameter) {
+  return request({
+    url: api.oneByOnePageList,
+    method: 'post',
+    params: parameter
+  })
+}
+export function oneByOnePageListJPQL (parameter) {
+  return request({
+    url: api.oneByOnePageListJPQL,
+    method: 'post',
+    params: parameter
+  })
+}
+export function oneByOneListByJPQL (parameter) {
+  return request({
+    url: api.oneByOneListByJPQL,
+    method: 'post',
+    params: parameter
+  })
+}
+export function oneByOneList (parameter) {
+  return request({
+    url: api.oneByOneList,
+    method: 'post',
+    params: parameter
+  })
+}
+export function oneByOneSave (parameter) {
+  return request({
+    url: api.oneByOneSave,
+    method: 'post',
+    data: parameter,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
 
+export function oneByOneEdit (parameter) {
+  return request({
+    url: api.oneByOneEdit,
+    method: 'post',
+    data: parameter,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
+
+export function oneByOneDelete (parameter) {
+  return request({
+    url: api.oneByOneDelete,
+    method: 'post',
+    params: parameter
+  })
+}
+
+export function oneByOneQuery (parameter) {
+  return request({
+    url: api.oneByOneQuery,
+    method: 'post',
+    params: parameter
+  })
+}
+//班级
 export function classesPageList (parameter) {
   return request({
     url: api.classesPageList,

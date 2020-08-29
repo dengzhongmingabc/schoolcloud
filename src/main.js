@@ -27,6 +27,11 @@ import Print from 'vue-print-nb'
 Vue.config.productionTip = false
 
 
+import VCalendar from 'v-calendar';
+Vue.use(VCalendar, {
+  componentPrefix: 'vc'       // 其他设置
+});
+
 
 Vue.use(Print);
 

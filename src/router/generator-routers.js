@@ -65,6 +65,7 @@ const constantRouterComponents = {
   'CourseTypeSetting': () => import('@/views/teach/course/courseTypeSetting'),
 
   'Classes': () => import('@/views/teach/classes/Classes'),
+  'OneByOne': () => import('@/views/teach/onebyone/OneByOne'),
 
 
   //招生中心

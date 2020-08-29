@@ -1,76 +1,61 @@
 <template>
   <page-header-wrapper>
-  <a-card :bordered="false">
-    <div class="table-page-search-wrapper">
-      <a-form layout="inline">
-        <a-row :gutter="48">
-          <a-col a-col :xxl="4" :xl="6" :md="12" :sm="24" style="padding-right: 0px">
-            <a-form-item label="名称">
-              <a-input v-model="queryParam.name" placeholder=""/>
-            </a-form-item>
-          </a-col>
-          <a-col :xxl="6" :xl="8" :md="12" :sm="24" style="padding-right: 0px">
-            <a-form-item label="状态">
-              <a-radio-group default-value="" @change="$refs.table.refresh(true)" v-model="queryParam.forbidden"
-                             button-style="solid">
-                <a-radio-button value="">
-                  全部
-                </a-radio-button>
-                <a-radio-button value="false">
-                  有效
-                </a-radio-button>
-                <a-radio-button value="true">
-                  无效
-                </a-radio-button>
-              </a-radio-group>
-            </a-form-item>
-          </a-col>
+    <a-card :bordered="false">
+      <div class="table-page-search-wrapper">
+        <a-form layout="inline">
+          <a-row :gutter="48">
+            <a-col a-col :xxl="4" :xl="6" :md="12" :sm="24" style="padding-right: 0px">
+              <a-form-item label="名称">
+                <a-input v-model="queryParam.name" placeholder=""/>
+              </a-form-item>
+            </a-col>
+            <a-col :xxl="6" :xl="8" :md="12" :sm="24" style="padding-right: 0px">
+              <a-form-item label="状态">
+                <a-radio-group default-value="" @change="$refs.table.refresh(true)" v-model="queryParam.forbidden"
+                               button-style="solid">
+                  <a-radio-button value="">
+                    全部
+                  </a-radio-button>
+                  <a-radio-button value="false">
+                    有效
+                  </a-radio-button>
+                  <a-radio-button value="true">
+                    无效
+                  </a-radio-button>
+                </a-radio-group>
+              </a-form-item>
+            </a-col>
 
-          <a-col :md="8" :sm="24">
+            <a-col :md="8" :sm="24">
               <span class="table-page-search-submitButtons"
                     :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
                 <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
                 <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
               </span>
-          </a-col>
-        </a-row>
-      </a-form>
-    </div>
-
-    <div class="table-operator">
-      <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
-    </div>
+            </a-col>
+          </a-row>
+        </a-form>
+      </div>
 
 
-    <s-table
-      ref="table"
-      size="default"
-      rowKey="id"
-      :columns="columns"
-      :data="loadData"
-      :alert="true"
-      :rowSelection="rowSelection"
-      showPagination="auto"
-    >
+      <s-table
+        ref="table"
+        size="default"
+        rowKey="id"
+        :columns="columns"
+        :data="loadData"
+        :alert="true"
+        :rowSelection="rowSelection"
+        showPagination="auto"
+      >
 
-      <span slot="teacher" slot-scope="cellData">
-          {{cellData.realName}}
+      <span slot="seekPerson" slot-scope="cellData">
+          {{seekPersonMap[cellData].text}}
       </span>
-      <span slot="teachCourse" slot-scope="cellData">
-          {{cellData.name}}
-      </span>
-      <span slot="school" slot-scope="cellData">
-          {{cellData.name}}
-      </span>
-      <span slot="personCountCurrent" slot-scope="cellData,record">
-          {{`${cellData}/${record.personCount}`}}
-      </span>
-      <span slot="status" slot-scope="cellData">
-          {{cellData==1?'开放':'关闭'}}
-      </span>
-      <span slot="action" slot-scope="text, record">
+
+        <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)">编辑</a>
+            <a @click="handleEdit(record)">排课</a>
             <a-divider type="vertical"/>
             <a-dropdown>
               <a class="ant-dropdown-link">更多 <a-icon type="down" />
@@ -85,47 +70,53 @@
                   </a-popconfirm>
                 </a-menu-item>
                 <a-menu-item>
-                    <a  @click="studentHandleAdd(record)">分配学员</a>
+                    <a  @click="studentHandleAdd(record)">分配任课老师</a>
                 </a-menu-item>
                 <a-menu-item>
-                    <a  @click="">排课</a>
+                    <a  @click="studentHandleAdd(record)">排课</a>
+                </a-menu-item>
+                <a-menu-item>
+                    <a  @click="">上课记录</a>
+                </a-menu-item>
+                <a-menu-item>
+                    <a  @click="">课程表</a>
                 </a-menu-item>
               </a-menu>
           </a-dropdown>
 
           </template>
         </span>
-    </s-table>
+      </s-table>
 
 
-    <CreateClassForm
-      ref="createClassForm"
-      :visible="visible"
-      :loading="confirmLoading"
-      :model="mdl"
-      :roles="roleListData"
-      @cancel="handleCancel"
-      @ok="handleOk"
-    />
+      <CourseModel
+        ref="courseModel"
+        :visible="visible"
+        :loading="confirmLoading"
+        :model="mdl"
+        :roles="roleListData"
+        @cancel="handleCancel"
+        @ok="handleOk"
+      />
 
-    <SelectStudent
-      ref="selectStudent"
-      :visible="studentVisible"
-      :loading="studentConfirmLoading"
-      :model="studentMdl"
-      @cancel="studentHandleAddCancel"
-      @ok="studentAdd"
-    />
-  </a-card>
+      <SelectStudent
+        ref="selectStudent"
+        :visible="studentVisible"
+        :loading="studentConfirmLoading"
+        :model="studentMdl"
+        @cancel="studentHandleAddCancel"
+        @ok="studentAdd"
+      />
+    </a-card>
   </page-header-wrapper>
 </template>
 
 <script>
   import moment from 'moment'
   import {STable, Ellipsis} from '@/components'
-  import {classesSave, classesDelete, classesPageList, classesQuery,studentAddToClass, classesEdit} from '@/api/teach'
+  import {classesSave, classesDelete, classesPageList,oneByOnePageListJPQL,oneByOneListByJPQL, classesQuery,studentAddToClass, classesEdit} from '@/api/teach'
 
-  import CreateClassForm from "./components/CreateClassForm";
+  import CourseModel from "./components/CourseModel";
   import SelectStudent from "./components/SelectStudent";
 
   import {courseList} from '@/api/teach'
@@ -136,63 +127,41 @@
 
   const columns = [
     {
-      title: '名称',
-      dataIndex: 'name',
+      title: '学生名称',
+      dataIndex: 'marketStudent.studentName',
     },
     {
-      title: '满班人数',
-      dataIndex: 'personCount',
+      title: '关系',
+      dataIndex: 'marketStudent.seekPerson',
+      scopedSlots: {customRender: 'seekPerson'}
     },
     {
-      title: '成班人数',
-      dataIndex: 'classPersonCount',
+      title: '电话',
+      dataIndex: 'marketStudent.mobile',
     },
     {
-      title: '现在学员',
-      dataIndex: 'personCountCurrent',
-      scopedSlots: {customRender: 'personCountCurrent'}
+      title: '课程',
+      dataIndex: 'course.name',
     },
     {
-      title: '老师名称',
-      dataIndex: 'teacher',
-      scopedSlots: {customRender: 'teacher'}
+      title: '任课老师',
+      dataIndex: 'teacher.realName',
+    },
+
+    {
+      title: '所属学校',
+      dataIndex: 'school.name',
     },
     {
-      title: '课程名称',
-      dataIndex: 'teachCourse',
-      scopedSlots: {customRender: 'teachCourse'}
+      title: '报名时间',
+      dataIndex: 'createdDate',
+      scopedSlots: {customRender: 'endDate'}
     },
     {
       title: '开始时间',
       dataIndex: 'startDate',
-      scopedSlots: {customRender: 'startDate'}
     },
-    {
-      title: '结束时间',
-      dataIndex: 'endDate',
-      scopedSlots: {customRender: 'endDate'}
-    },
-    {
-      title: '所属学校',
-      dataIndex: 'school',
-      scopedSlots: {customRender: 'school'}
-    },
-    {
-      title: '备注',
-      dataIndex: 'remark',
-      ellipsis: true,
-    },
-    {
-      title: '招生状态',
-      dataIndex: 'status',
-      scopedSlots: {customRender: 'status'}
-    },
-    {
-      title: '更新时间',
-      dataIndex: 'createdDate',
-      ellipsis: true,
-      sorter: true
-    },
+
     {
       title: '操作',
       dataIndex: 'action',
@@ -207,7 +176,7 @@
     components: {
       STable,
       Ellipsis,
-      CreateClassForm,
+      CourseModel,
       SelectStudent
     },
     data() {
@@ -234,19 +203,20 @@
           console.log(requestParameters['name']);
           let search = '';
           if (requestParameters['name']) {
-            search += ' and name like \'%' + requestParameters['name'] + '%\''
+            search += ' and obj.marketStudent.studentName like \'%' + requestParameters['name'] + '%\''
           }
           if (requestParameters['forbidden']) {
-            search += ' and forbidden=' + requestParameters['forbidden']
+            search += ' and obj.marketStudent.forbidden=' + requestParameters['forbidden']
           }
           requestParameters.search = search;
-          return classesPageList(requestParameters).then(res => {
+          return oneByOnePageListJPQL(requestParameters).then(res => {
             return res.result
           })
         },
         selectedRowKeys: [],
         selectedRows: [],
         currentClassId:0,
+        seekPersonMap: { 1: {text: '母亲'},2: {text: '父亲'}, 3: {text: '本人'}, 4: {text: '其它'}},
         currentCourseId:0
       }
     },
@@ -271,9 +241,6 @@
     },
     methods: {
       studentHandleAdd(record) {
-        this.currentClassId = record.id
-        this.currentCourseId = record.teachCourse.id
-        this.$refs.selectStudent.getMock(record.teachCourse.id)
         this.studentVisible = true
       },
       studentHandleAddCancel(record) {
@@ -312,12 +279,12 @@
 
       handleEdit(record) {
         const requestParameters = {}
-        let search = ' and teach_type=2 ';
-        requestParameters.search = search;
+        /*let search = ' and obj.teach_type=2 ';
+        requestParameters.search = search;*/
         this.mdl = {...record}
-        Promise.all([courseList(requestParameters), userList()]).then((result) => {
+        Promise.all([oneByOneListByJPQL(requestParameters), userList()]).then((result) => {
           console.log(result);
-          this.mdl.courses = result[0].result;
+          this.mdl.oneByOnes = result[0].result;
           this.mdl.users = result[1].result
           this.visible = true
         }).catch((error) => {
