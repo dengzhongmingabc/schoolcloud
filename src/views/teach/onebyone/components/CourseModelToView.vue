@@ -15,11 +15,11 @@
         class='demo-app-calendar'
         :options='calendarOptions'
       >
-        <template v-slot:eventContent='arg'>
-          <!--<b>{{ arg.event.start }}</b>
-          <i>{{ arg.event.title }}</i>-->
+       <!-- <template v-slot:eventContent='arg'>
+          &lt;!&ndash;<b>{{ arg.event.start }}</b>
+          <i>{{ arg.event.title }}</i>&ndash;&gt;
           <i>{{ arg.event.title }}</i>
-        </template>
+        </template>-->
       </FullCalendar>
     </template>
 
@@ -101,9 +101,9 @@
               allowHTML: true,
               // content: info.event.extendedProps.name,
               // placement: "top-start",
-              arrowType: 'sharp',
-               arrow: true,
-              size: "small",
+              // arrowType: 'sharp',
+              //  arrow: true,
+              // size: "small",//
               delay: [300, 300],
               // 鼠标放在提示中提示不消失
               interactive: true,
@@ -141,7 +141,8 @@
             hour12: false //设置时间为24小时
           },
           eventsSet: this.handleEvents,
-          slotDuration:'00:05:00'
+          slotDuration:'00:05:00',
+          showNonCurrentDates:false,
           /* you can update a remote database when these fire:
           eventAdd:
           eventChange:

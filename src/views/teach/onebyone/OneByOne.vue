@@ -53,12 +53,21 @@
           {{seekPersonMap[cellData].text}}
       </span>
 
+        <span slot="courseModel" slot-scope="cellData">
+          <a-tag v-if="cellData!=undefined" :color="'green'" >
+             是
+          </a-tag>
+          <a-tag v-if="cellData==undefined" :color="'red'" >
+             否
+          </a-tag>
+      </span>
+
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)">排课</a>
-            <a-divider type="vertical"/>
+            <!--<a @click="handleEdit(record)">排课</a>
+            <a-divider type="vertical"/>-->
             <a-dropdown>
-              <a class="ant-dropdown-link">更多 <a-icon type="down" />
+              <a class="ant-dropdown-link">更多 <a-icon type="down"/>
               </a>
               <a-menu slot="overlay">
                 <a-menu-item>
@@ -66,20 +75,20 @@
                     title="您确定要删除吗?"
                     @confirm="() => classesDeleteF(record)"
                   >
-                  <a  href="javascript:;" ref="classesDelete">删除</a>
+                  <a href="javascript:;" ref="classesDelete">删除</a>
                   </a-popconfirm>
                 </a-menu-item>
                 <a-menu-item>
-                    <a  @click="studentHandleAdd(record)">分配任课老师</a>
+                    <a @click="studentHandleAdd(record)">分配任课老师</a>
                 </a-menu-item>
                 <a-menu-item>
-                    <a  @click="studentHandleAdd(record)">排课</a>
+                    <a @click="handleEdit(record)">排课</a>
                 </a-menu-item>
                 <a-menu-item>
-                    <a  @click="">上课记录</a>
+                    <a @click="">上课记录</a>
                 </a-menu-item>
                 <a-menu-item>
-                    <a  @click="">课程表</a>
+                    <a @click="">课程表</a>
                 </a-menu-item>
               </a-menu>
           </a-dropdown>
@@ -114,15 +123,19 @@
 <script>
   import moment from 'moment'
   import {STable, Ellipsis} from '@/components'
-  import {classesSave, classesDelete, classesPageList,oneByOnePageListJPQL,oneByOneListByJPQL, classesQuery,studentAddToClass, classesEdit} from '@/api/teach'
+  import {
+    classesDelete,
+    oneByOnePageListJPQL,
+    oneByOneListByJPQL,
+    studentAddToClass,
+  } from '@/api/teach'
 
   import CourseModel from "./components/CourseModel";
   import SelectStudent from "./components/SelectStudent";
 
   import {courseList} from '@/api/teach'
   import {userList} from '@/api/sysManage'
-
-
+  import {courseModelSave} from '@/api/courseModel'
 
 
   const columns = [
@@ -157,9 +170,20 @@
       dataIndex: 'createdDate',
       scopedSlots: {customRender: 'endDate'}
     },
-    {
+   /* {
       title: '开始时间',
       dataIndex: 'startDate',
+    },*/
+
+    {
+      title: '所剩课程数',
+      dataIndex: 'courseCount',
+    },
+
+    {
+      title: '是否已排课',
+      dataIndex: 'courseModel',
+      scopedSlots: {customRender: 'courseModel'}
     },
 
     {
@@ -215,9 +239,9 @@
         },
         selectedRowKeys: [],
         selectedRows: [],
-        currentClassId:0,
-        seekPersonMap: { 1: {text: '母亲'},2: {text: '父亲'}, 3: {text: '本人'}, 4: {text: '其它'}},
-        currentCourseId:0
+        currentClassId: 0,
+        seekPersonMap: {1: {text: '母亲'}, 2: {text: '父亲'}, 3: {text: '本人'}, 4: {text: '其它'}},
+        currentCourseId: 0
       }
     },
     filters: {
@@ -251,12 +275,12 @@
         let value = {};
         value.classId = this.currentClassId
         value.courseId = this.currentCourseId
-        let studentkeys = data.map((item)=>{
-          return  item.key
+        let studentkeys = data.map((item) => {
+          return item.key
         })
         let studentIds = studentkeys.join(",")
         value.studentIds = studentIds;
-        studentAddToClass(value).then((res)=>{
+        studentAddToClass(value).then((res) => {
           this.$refs.table.refresh(true)
           this.studentVisible = false
         })
@@ -276,58 +300,85 @@
           console.log(error)
         })
       },
-
       handleEdit(record) {
         const requestParameters = {}
-        /*let search = ' and obj.teach_type=2 ';
-        requestParameters.search = search;*/
         this.mdl = {...record}
         Promise.all([oneByOneListByJPQL(requestParameters), userList()]).then((result) => {
           console.log(result);
+          this.mdl.teacher = record.teacherId == 0 ? 0 : {key:record.teacher.id, label:record.teacher.realName}
+          this.mdl.classOrOneByOne = {key: record.id, label: record.course.name}
           this.mdl.oneByOnes = result[0].result;
           this.mdl.users = result[1].result
+          console.log(this.mdl)
           this.visible = true
         }).catch((error) => {
           console.log(error)
         })
       },
       handleOk() {
-        const form = this.$refs.createClassForm.form
-        const endDate = this.$refs.createClassForm.endDate
-        const startDate = this.$refs.createClassForm.startDate
+        const form = this.$refs.courseModel.form
         this.confirmLoading = true
+        let dates = this.$refs.courseModel.dates
+        let events = [];
         form.validateFields((errors, values) => {
           if (!errors) {
-            values.endDate = endDate;
-            values.startDate = startDate;
-            console.log('values', values)
-            const param = JSON.stringify(values);
-
-            if (values.id > 0) {
-              // 修改 e.g.
-              classesEdit(param).then((response) => {
-                this.visible = false
-                this.confirmLoading = false
-                // 重置表单数据
-                form.resetFields()
-                // 刷新表格
-                this.$refs.table.refresh()
-
-                this.$message.info('修改成功')
-              })
-            } else {
-              // 新增
-              classesSave(param).then((response) => {
-                this.visible = false
-                this.confirmLoading = false
-                // 重置表单数据
-                form.resetFields()
-                // 刷新表格
-                this.$refs.table.refresh()
-
-                this.$message.info('新增成功')
-              })
+            if(values.courseModel=='2'&&(!values.weekModel||values.weekModel.length<1)){
+              this.$message.error('请选择上课星期！');
+              this.confirmLoading = false
+              return;
             }
+            if(values.courseModel=='2'&&!values.startDate){
+              this.$message.error('请选择开始时间！');
+              this.confirmLoading = false
+              return;
+            }
+            if(values.courseModel=='2'&&!values.repeatModel){
+              this.$message.error('请选择循环周末！');
+              this.confirmLoading = false
+              return;
+            }
+            if(values.courseModel=='1'&&dates.length<1){
+              this.$message.error('请选择日期！');
+              this.confirmLoading = false
+              return;
+            }
+            values.startDate = moment(values.startDate).format('YYYY-MM-DD')
+            if (values.courseModel == 2) {
+              let i = 0
+              dates = []
+              while (dates.length < 11) {
+                let date = moment(values.startDate).add(i, 'days')
+                var weekday = date.weekday();
+                if (values.weekModel.includes(weekday + '')) {
+                  dates.push(moment(date).format('YYYY-MM-DD'))
+                }
+                if(values.repeatModel=='2'&&weekday == 6){
+                  i+=8
+                }else {
+                  i++;
+                }
+              }
+              console.log(dates);
+            }
+            for (let date of dates) {
+              console.log(values);
+              console.log(date);
+              let event = {}
+              event.title = `${values.classOrOneByOne.label}`
+              event.start = moment(date).format('YYYY-MM-DD') + ' ' + moment(values.startTime).format('HH:mm:ss')
+              event.end = moment(date).format('YYYY-MM-DD') + ' ' + moment(values.endTime).format('HH:mm:ss')
+              events.push(event)
+            }
+            values.events = events
+            values.startTime = moment(values.startTime).format('HH:mm:ss')
+            values.endTime = moment(values.endTime).format('HH:mm:ss')
+            const param = JSON.stringify(values);
+            courseModelSave(param).then((response) => {
+              this.visible = false
+              this.confirmLoading = false
+              form.resetFields()
+              this.$refs.table.refresh()
+            })
           } else {
             this.confirmLoading = false
           }
@@ -335,14 +386,14 @@
       },
       handleCancel() {
         this.visible = false
-        const form = this.$refs.createClassForm.form
+        const form = this.$refs.courseModel.form
         form.resetFields() // 清理表单数据（可不做）
       },
 
       classesDeleteF(record) {
         let self = this;
         let params = {}
-        params.id=record.id
+        params.id = record.id
         classesDelete(params).then((response) => {
           self.$message.info(`${record.name} 删除成功`)
           self.$refs.table.refresh()
