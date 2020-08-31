@@ -40,11 +40,11 @@
           <a-form-item label="上课时间段">
             <template>
               <a-time-picker placeholder="开始时间"
-                             v-decorator="['startTime', {initialValue: model.courseModel==undefined?null:moment(model.courseModel.startTime, 'HH:mm:ss')},{rules: [{required: true, message: '开始时间!' }]}]"
-                             :minute-step="5" :second-step="60"/>
+                             v-decorator="['startTime', {initialValue: this.startTime},{rules: [{required: true, message: '开始时间!' }]}]"
+                             :minute-step="5" :second-step="60" @change="startTimeChange"/>
               <a-time-picker placeholder="结束时间"
-                             v-decorator="['endTime',{initialValue: model.courseModel==undefined?null:moment(model.courseModel.endTime, 'HH:mm:ss')},{rules: [{required: true, message: '结束时间!' }]}]" :minute-step="5"
-                             :second-step="60"/>
+                             v-decorator="['endTime',{initialValue: this.endTime},{rules: [{required: true, message: '结束时间!' }]}]" :minute-step="5"
+                             :second-step="60" @change="endTimeChange"/>
             </template>
           </a-form-item>
           <a-form-item label="排课方式">
@@ -181,6 +181,8 @@
         weekModel: [],
         repeatModel: '1',
         startDate: '',
+        startTime:null,
+        endTime:null
       }
     },
     created() {
@@ -194,6 +196,8 @@
         this.weekModel = this.model.courseModel==undefined?[]:this.model.courseModel.weekModel
         this.repeatModel = this.model.courseModel==undefined||this.model.courseModel.courseModel=='1'?'1':this.model.courseModel.repeatModel
         this.startDate = this.model.courseModel==undefined||this.model.courseModel.courseModel=='1'?null:this.model.courseModel.startDate
+        this.startTime = this.model.courseModel==undefined?null:moment(this.model.courseModel.startTime, 'HH:mm:ss')
+        this.endTime = this.model.courseModel==undefined?null:moment(this.model.courseModel.endTime, 'HH:mm:ss')
         this.dates = this.model.courseModel==undefined||this.model.courseModel.courseModel=='2'?[]:this.model.courseModel.events.map((item)=>{
           return new Date(moment(item.start,'YYYY-MM-DD').valueOf())
         })
@@ -202,6 +206,14 @@
       })
     },
     methods: {
+      startTimeChange(time, timeString){
+        console.log(time, timeString);
+        this.startTime = timeString
+      },
+      endTimeChange(time, timeString){
+        console.log(time, timeString);
+        this.endTime = timeString
+      },
       changeDates(value){
         console.log(value)
       },
