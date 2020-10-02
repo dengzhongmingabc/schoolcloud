@@ -33,6 +33,9 @@ Vue.use(VCalendar, {
 });
 
 
+import echarts from 'echarts'
+Vue.prototype.$echarts = echarts
+
 Vue.use(Print);
 
 // mount axios to `Vue.$http` and `this.$http`
