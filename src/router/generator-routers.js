@@ -68,10 +68,31 @@ const constantRouterComponents = {
   'OneByOne': () => import('@/views/teach/onebyone/OneByOne'),
 
 
+
+  //记课
+  'MarkCourse': () => import('@/views/teach/markcourse/MarkCourse'),
+  //花名册
+  'RosterManager': () => import('@/views/teach/roster/RosterManager'),
+  //报读列表
+  'SignUpManager': () => import('@/views/teach/signup/SignUpManager'),
+
+
   //招生中心
   'SeekManager': () => import('@/views/market/SeekManager'),
   'Seek': () => import('@/views/market/Seek'),
   'TalkStudent': () => import('@/views/market/TalkStudent'),
+  'TalkTo': () => import('@/views/market/talk/TalkTo'),
+
+
+
+   //公有池
+  'PoolManager': () => import('@/views/market/pool/poolManger'),
+  //渠道管理
+  'ChannelManager': () => import('@/views/market/channel/ChannelManager'),
+  //优惠活动
+  'Discount': () => import('@/views/market/discount/discount'),
+  //用户表单
+  'UserForm': () => import('@/views/market/userform/UserForm'),
 
 
   //办理中心
@@ -79,6 +100,37 @@ const constantRouterComponents = {
   'FillFee': () => import('@/views/handler/FillFee'),
   'SignRenew': () => import('@/views/handler/SignRenew'),
   'Voucher': () => import('@/views/handler/Voucher'),
+
+
+
+  //家校互联
+  //请假审批
+  'ApprovalManager': () => import('@/views/connection/approval/ApprovalManager'),
+  //课堂点评
+  'CommentManager': () => import('@/views/connection/comment/CommentManager'),
+  //反馈
+  'FeedbackManager': () => import('@/views/connection/feedback/FeedbackManager'),
+  //通知
+  'NoticeManager': () => import('@/views/connection/notice/NoticeManager'),
+  //设置
+  'Setting': () => import('@/views/connection/setting/Setting'),
+  //作业
+  'TaskManager': () => import('@/views/connection/task/TaskManager'),
+
+
+
+  //系统设置
+  //杂费
+  'Incidental': () => import('@/views/setting/incidental/Incidental'),
+  //教材费
+  'Material': () => import('@/views/setting/material/Material'),
+
+
+  //统计分析
+  //咨询相关统计
+  'SeekStatistics': () => import('@/views/statistics/seekStatistics/SeekStatistics'),
+  //教师课消统计
+  'TeacherStatistics': () => import('@/views/statistics/teacherStatistics/TeacherStatistics'),
 
 
 

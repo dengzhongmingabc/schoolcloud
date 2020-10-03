@@ -11,7 +11,8 @@ export default {
 
       localLoading: false,
       localDataSource: [],
-      localPagination: Object.assign({}, this.pagination)
+      localPagination: Object.assign({}, this.pagination),
+      totalCount:0
     }
   },
   props: Object.assign({}, T.props, {
@@ -171,6 +172,7 @@ export default {
             return
           }
 
+          this.totalCount = r.totalCount
           // 这里用于判断接口是否有返回 r.totalCount 且 this.showPagination = true 且 pageNo 和 pageSize 存在 且 totalCount 小于等于 pageNo * pageSize 的大小
           // 当情况满足时，表示数据不满足分页大小，关闭 table 分页功能
           try {
@@ -243,7 +245,7 @@ export default {
       // 绘制统计列数据
       const needTotalItems = this.needTotalList.map((item) => {
         return (<span style="margin-right: 12px">
-          {item.title}总计 <a style="font-weight: 600">{!item.customRender ? item.total : item.customRender(item.total)}</a>
+          {item.title}总计： <a style="font-weight: 600">{!item.customRender ? item.total : item.customRender(item.total)}</a>
         </span>)
       })
 
@@ -254,11 +256,12 @@ export default {
         this.renderClear(this.alert.clear)
       ) : null
 
-      // 绘制 alert 组件
+      // 绘制 alert 组件this.localPagination
       return (
         <a-alert showIcon={true} style="margin-bottom: 16px">
           <template slot="message">
-            <span style="margin-right: 12px">已选择: <a style="font-weight: 600">{this.selectedRows.length}</a></span>
+            <span style="margin-right: 12px">查询结果: <a style="font-weight: 600">{this.totalCount}</a>条记录，</span>
+            <span style="margin-right: 12px">已选择: <a style="font-weight: 600">{this.selectedRows.length}</a>，</span>
             {needTotalItems}
             {clearItem}
           </template>
